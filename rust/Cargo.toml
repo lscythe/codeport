@@ -6,8 +6,12 @@ edition = "2021"
 [lib]
 crate-type = ["cdylib", "staticlib"]
 
+[workspace]
+members = ["crates/*"]
+
 [dependencies]
 flutter_rust_bridge = "=2.13.0"
+codeport-core = { path = "crates/codeport-core" }
 
 [lints.rust]
 unexpected_cfgs = { level = "warn", check-cfg = ['cfg(frb_expand)'] }

@@ -1,0 +1,16 @@
+name: codeport
+repository: https://github.com/example/codeport
+
+packages:
+  - apps/**
+  - packages/**
+
+scripts:
+  analyze: melos exec -- "flutter analyze --no-pub"
+  test: melos exec -- "flutter test"
+  bootstrap: melos bootstrap
+  frb: >
+    dart run flutter_rust_bridge_codegen generate
+    --rust-input crate::api
+    --rust-root rust/
+    --dart-output packages/codeport_core/lib/src/rust
