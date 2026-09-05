@@ -12,6 +12,7 @@ members = ["crates/*"]
 [dependencies]
 flutter_rust_bridge = "=2.13.0"
 codeport-core = { path = "crates/codeport-core" }
+codeport-github = { path = "crates/codeport-github" }
 
 [lints.rust]
 unexpected_cfgs = { level = "warn", check-cfg = ['cfg(frb_expand)'] }

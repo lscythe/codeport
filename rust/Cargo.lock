@@ -595,6 +595,7 @@ name = "rust_lib_codeport"
 version = "0.1.0"
 dependencies = [
  "codeport-core",
+ "codeport-github",
  "flutter_rust_bridge",
 ]
 
