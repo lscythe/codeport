@@ -1,6 +1,7 @@
 commit-msg:
-  jobs:
-    - run: sh scripts/commit-msg.sh {1}
+  commands:
+    style:
+      run: sh scripts/commit-msg.sh {1}
 
 pre-commit:
   parallel: true
@@ -8,14 +9,15 @@ pre-commit:
     flutter-format:
       run: dart format --output=none --set-exit-if-changed .
     flutter-analyze:
-      run: flutter analyze
+      run: flutter analyze --no-pub
     rust-fmt:
       root: rust/
       run: cargo fmt --check
     rust-clippy:
       root: rust/
-      run: cargo clippy -- -D warnings
+      run: cargo clippy --all-targets -- -D warnings
     bridge-check:
+      files: git diff --cached --name-only
       glob:
         - "rust/**/*.rs"
         - flutter_rust_bridge.yaml
