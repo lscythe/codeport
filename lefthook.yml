@@ -1,0 +1,22 @@
+commit-msg:
+  jobs:
+    - run: sh scripts/commit-msg.sh {1}
+
+pre-commit:
+  parallel: true
+  commands:
+    flutter-format:
+      run: dart format --output=none --set-exit-if-changed .
+    flutter-analyze:
+      run: flutter analyze
+    rust-fmt:
+      root: rust/
+      run: cargo fmt --check
+    rust-clippy:
+      root: rust/
+      run: cargo clippy -- -D warnings
+    bridge-check:
+      glob:
+        - "rust/**/*.rs"
+        - flutter_rust_bridge.yaml
+      run: flutter_rust_bridge_codegen generate --rust-input crate::api --rust-root rust/ --dart-output packages/codeport_core/lib/src/rust

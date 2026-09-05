@@ -1,4 +1,6 @@
-use codeport_core::entities::{Issue, IssueState, Pipeline, PipelineConclusion, PipelineStatus, Repo};
+use codeport_core::entities::{
+    Issue, IssueState, Pipeline, PipelineConclusion, PipelineStatus, Repo,
+};
 
 #[test]
 fn repo_maps_github_repository_payload() {

@@ -3,8 +3,14 @@ import 'package:codeport_core/codeport_core.dart';
 
 void main() {
   test('guard maps same Rust failure message to one AppFailure', () async {
-    final a = UseCaseGuard.guard(() async => throw const RustBridgeException('rate limited, retry after 1'));
-    final b = UseCaseGuard.guard(() async => throw const RustBridgeException('rate limited, retry after 1'));
+    final a = UseCaseGuard.guard(
+      () async =>
+          throw const RustBridgeException('rate limited, retry after 1'),
+    );
+    final b = UseCaseGuard.guard(
+      () async =>
+          throw const RustBridgeException('rate limited, retry after 1'),
+    );
 
     await expectLater(a, throwsA(isA<AppFailure>()));
     await expectLater(b, throwsA(isA<AppFailure>()));
