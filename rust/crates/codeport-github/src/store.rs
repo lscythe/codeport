@@ -2,6 +2,7 @@ use crate::client::GithubClient;
 use crate::{cicd, issues, repos};
 use codeport_core::entities::{CiJob, Commit, Issue, IssueComment, Pipeline, Repo};
 use codeport_core::error::CodeportError;
+use codeport_core::traits::{CiStore, IssueStore, RepoStore};
 
 pub trait HttpClient {
     fn get(&self, url: &str, auth: &str) -> Result<HttpResponse, CodeportError>;
@@ -197,5 +198,92 @@ impl<C: HttpClient> GithubStore<C> {
         let url = cicd::list_jobs_url(full_name, run_id);
         let res = self.http.get(&url, &self.auth)?;
         self.result(res, cicd::parse_jobs)
+    }
+}
+
+impl<C: HttpClient> RepoStore for GithubStore<C> {
+    fn list_repos(&self, page: u32) -> Result<(Vec<Repo>, Option<u32>), CodeportError> {
+        GithubStore::list_repos(self, page)
+    }
+
+    fn get_repo(&self, full_name: &str) -> Result<Repo, CodeportError> {
+        GithubStore::get_repo(self, full_name)
+    }
+
+    fn list_commits(&self, full_name: &str) -> Result<Vec<Commit>, CodeportError> {
+        GithubStore::list_commits(self, full_name)
+    }
+}
+
+impl<C: HttpClient> IssueStore for GithubStore<C> {
+    fn list_issues(
+        &self,
+        full_name: &str,
+        state: Option<&str>,
+    ) -> Result<Vec<Issue>, CodeportError> {
+        GithubStore::list_issues(self, full_name, state)
+    }
+
+    fn get_issue(&self, full_name: &str, number: u64) -> Result<Issue, CodeportError> {
+        GithubStore::get_issue(self, full_name, number)
+    }
+
+    fn list_comments(
+        &self,
+        full_name: &str,
+        number: u64,
+    ) -> Result<Vec<IssueComment>, CodeportError> {
+        GithubStore::list_comments(self, full_name, number)
+    }
+
+    fn create_issue(
+        &self,
+        full_name: &str,
+        title: &str,
+        body: Option<&str>,
+    ) -> Result<Issue, CodeportError> {
+        GithubStore::create_issue(self, full_name, title, body)
+    }
+
+    fn set_issue_state(
+        &self,
+        full_name: &str,
+        number: u64,
+        state: &str,
+    ) -> Result<Issue, CodeportError> {
+        match state {
+            "closed" => GithubStore::close_issue(self, full_name, number),
+            "open" => GithubStore::reopen_issue(self, full_name, number),
+            _ => Err(CodeportError::Validation(format!(
+                "unknown issue state: {state}"
+            ))),
+        }
+    }
+
+    fn create_comment(
+        &self,
+        full_name: &str,
+        number: u64,
+        body: &str,
+    ) -> Result<IssueComment, CodeportError> {
+        GithubStore::create_comment(self, full_name, number, body)
+    }
+}
+
+impl<C: HttpClient> CiStore for GithubStore<C> {
+    fn list_runs(&self, full_name: &str) -> Result<Vec<Pipeline>, CodeportError> {
+        GithubStore::list_runs(self, full_name)
+    }
+
+    fn get_run(&self, full_name: &str, run_id: u64) -> Result<Pipeline, CodeportError> {
+        GithubStore::get_run(self, full_name, run_id)
+    }
+
+    fn list_jobs(&self, full_name: &str, run_id: u64) -> Result<Vec<CiJob>, CodeportError> {
+        GithubStore::list_jobs(self, full_name, run_id)
+    }
+
+    fn retry_run(&self, full_name: &str, run_id: u64) -> Result<(), CodeportError> {
+        GithubStore::retry_run(self, full_name, run_id)
     }
 }

@@ -177,6 +177,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "codeport-gitlab-stub"
+version = "0.1.0"
+dependencies = [
+ "codeport-core",
+]
+
+[[package]]
 name = "console_error_panic_hook"
 version = "0.1.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"

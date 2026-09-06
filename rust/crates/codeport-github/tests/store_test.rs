@@ -1,4 +1,5 @@
 use codeport_core::error::CodeportError;
+use codeport_core::traits::{CiStore, IssueStore, RepoStore};
 use codeport_github::store::{GithubStore, HttpClient, HttpResponse};
 
 #[cfg(test)]
@@ -204,6 +205,62 @@ fn store_retry_maps_404_to_not_found() {
     let store = GithubStore::new("t".to_string(), stub).expect("valid token");
     let err = store.retry_run("o/r", 9).expect_err("404 must fail");
     assert_eq!(err, CodeportError::NotFound);
+}
+
+#[test]
+fn store_conforms_to_core_traits_through_generics() {
+    fn browse<R: RepoStore, I: IssueStore, C: CiStore>(repos: &R, issues: &I, ci: &C) {
+        let (all, _) = repos.list_repos(1).expect("list works");
+        assert_eq!(all.len(), 1);
+        assert_eq!(repos.get_repo("o/r").expect("get works").full_name, "o/r");
+        assert_eq!(
+            repos.list_commits("o/r").expect("commits work")[0].sha,
+            "abc"
+        );
+        assert_eq!(issues.get_issue("o/r", 7).expect("get works").number, 7);
+        assert_eq!(
+            issues.list_comments("o/r", 7).expect("comments work").len(),
+            1
+        );
+        assert_eq!(ci.get_run("o/r", 12).expect("get works").run_number, 12);
+        assert_eq!(ci.list_jobs("o/r", 12).expect("jobs work")[0].name, "build");
+    }
+
+    let stub = test_double::stub(
+        Box::new(|url, _| {
+            let body = if url.contains("/commits") {
+                r#"[{"sha":"abc","commit":{"message":"Hi","author":{"name":"a"}}}]"#
+            } else if url.contains("/comments") {
+                r#"[{"id":5,"body":"Hi"}]"#
+            } else if url.contains("/jobs") {
+                r#"{"jobs":[{"id":9,"name":"build","status":"completed","conclusion":"success"}]}"#
+            } else if url.contains("/actions/runs/12") {
+                r#"{"id":12,"status":"completed","conclusion":"success","run_number":12}"#
+            } else if url.contains("/issues/7") {
+                r#"{"id":1,"number":7,"title":"Bug","state":"open","labels":[]}"#
+            } else if url.contains("/repos/o/r") {
+                r#"{"id":1,"full_name":"o/r","private":false}"#
+            } else {
+                r#"[{"id":1,"full_name":"o/r","private":false}]"#
+            };
+            Ok(test_double::ok(body))
+        }),
+        Box::new(|_, _| unreachable!()),
+    );
+    let store = GithubStore::new("t".to_string(), stub).expect("valid token");
+    browse(&store, &store, &store);
+}
+
+#[test]
+fn store_rejects_unknown_issue_state() {
+    let stub = test_double::stub(
+        Box::new(|_, _| unreachable!()),
+        Box::new(|_, _| unreachable!()),
+    );
+    let store = GithubStore::new("t".to_string(), stub).expect("valid token");
+    let err = IssueStore::set_issue_state(&store, "o/r", 7, "weird")
+        .expect_err("unknown state must fail");
+    assert!(err.to_string().contains("invalid"));
 }
 
 #[test]
