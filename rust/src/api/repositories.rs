@@ -1,13 +1,7 @@
-use codeport_core::entities::Repo;
+use super::RepoPage;
 use codeport_core::error::CodeportError;
 use codeport_github::http::BlockingHttp;
 use codeport_github::store::GithubStore;
-
-#[derive(Debug)]
-pub struct RepoPage {
-    pub repos: Vec<Repo>,
-    pub next_page: Option<u32>,
-}
 
 pub fn github_list_repos(token: String, page: u32) -> Result<RepoPage, CodeportError> {
     let store = GithubStore::new(token, BlockingHttp::new())?;

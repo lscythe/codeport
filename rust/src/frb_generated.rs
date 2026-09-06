@@ -329,11 +329,6 @@ const _: fn() = || {
         let _: u64 = Repo.stars;
         let _: String = Repo.default_branch;
     }
-    {
-        let RepoPage = None::<crate::api::RepoPage>.unwrap();
-        let _: Vec<crate::api::Repo> = RepoPage.repos;
-        let _: Option<u32> = RepoPage.next_page;
-    }
 };
 
 // Section: dart2rust
@@ -809,22 +804,19 @@ impl flutter_rust_bridge::IntoIntoDart<FrbWrapper<crate::api::Repo>> for crate::
     }
 }
 // Codec=Dco (DartCObject based), see doc to use other codecs
-impl flutter_rust_bridge::IntoDart for FrbWrapper<crate::api::RepoPage> {
+impl flutter_rust_bridge::IntoDart for crate::api::RepoPage {
     fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
         [
-            self.0.repos.into_into_dart().into_dart(),
-            self.0.next_page.into_into_dart().into_dart(),
+            self.repos.into_into_dart().into_dart(),
+            self.next_page.into_into_dart().into_dart(),
         ]
         .into_dart()
     }
 }
-impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
-    for FrbWrapper<crate::api::RepoPage>
-{
-}
-impl flutter_rust_bridge::IntoIntoDart<FrbWrapper<crate::api::RepoPage>> for crate::api::RepoPage {
-    fn into_into_dart(self) -> FrbWrapper<crate::api::RepoPage> {
-        self.into()
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive for crate::api::RepoPage {}
+impl flutter_rust_bridge::IntoIntoDart<crate::api::RepoPage> for crate::api::RepoPage {
+    fn into_into_dart(self) -> crate::api::RepoPage {
+        self
     }
 }
 
