@@ -71,14 +71,14 @@ fn wire__crate__api__issues__github_list_issues_impl(
                 flutter_rust_bridge::for_generated::SseDeserializer::new(message);
             let api_token = <String>::sse_decode(&mut deserializer);
             let api_full_name = <String>::sse_decode(&mut deserializer);
-            let api__state = <Option<String>>::sse_decode(&mut deserializer);
+            let api_state = <Option<String>>::sse_decode(&mut deserializer);
             deserializer.end();
             move |context| {
                 transform_result_sse::<_, crate::api::CodeportError>((move || {
                     let output_ok = crate::api::issues::github_list_issues(
                         api_token,
                         api_full_name,
-                        api__state,
+                        api_state,
                     )?;
                     std::result::Result::Ok(output_ok)
                 })())
@@ -178,11 +178,13 @@ fn wire__crate__api__cicd__github_retry_run_impl(
             let mut deserializer =
                 flutter_rust_bridge::for_generated::SseDeserializer::new(message);
             let api_token = <String>::sse_decode(&mut deserializer);
-            let api__run_id = <u64>::sse_decode(&mut deserializer);
+            let api_full_name = <String>::sse_decode(&mut deserializer);
+            let api_run_id = <u64>::sse_decode(&mut deserializer);
             deserializer.end();
             move |context| {
                 transform_result_sse::<_, crate::api::CodeportError>((move || {
-                    let output_ok = crate::api::cicd::github_retry_run(api_token, api__run_id)?;
+                    let output_ok =
+                        crate::api::cicd::github_retry_run(api_token, api_full_name, api_run_id)?;
                     std::result::Result::Ok(output_ok)
                 })())
             }

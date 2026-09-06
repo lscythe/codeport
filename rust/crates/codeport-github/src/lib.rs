@@ -7,6 +7,7 @@
 //! same `codeport-core` traits without touching core or Dart.
 pub mod cicd;
 pub mod client;
+pub mod http;
 pub mod issues;
 pub mod pagination;
 pub mod repos;

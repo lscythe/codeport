@@ -8,6 +8,7 @@ pub trait HttpClient {
     fn post_empty(&self, url: &str, auth: &str) -> Result<HttpResponse, CodeportError>;
 }
 
+#[derive(Debug)]
 pub struct HttpResponse {
     pub status: u16,
     pub body: String,

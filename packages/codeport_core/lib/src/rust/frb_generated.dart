@@ -104,6 +104,7 @@ abstract class RustLibApi extends BaseApi {
 
   Future<void> crateApiCicdGithubRetryRun({
     required String token,
+    required String fullName,
     required BigInt runId,
   });
 
@@ -231,6 +232,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   @override
   Future<void> crateApiCicdGithubRetryRun({
     required String token,
+    required String fullName,
     required BigInt runId,
   }) {
     return handler.executeNormal(
@@ -238,6 +240,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_String(token, serializer);
+          sse_encode_String(fullName, serializer);
           sse_encode_u_64(runId, serializer);
           pdeCallFfi(
             generalizedFrbRustBinding,
@@ -251,7 +254,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           decodeErrorData: sse_decode_codeport_error,
         ),
         constMeta: kCrateApiCicdGithubRetryRunConstMeta,
-        argValues: [token, runId],
+        argValues: [token, fullName, runId],
         apiImpl: this,
       ),
     );
@@ -259,7 +262,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   TaskConstMeta get kCrateApiCicdGithubRetryRunConstMeta => const TaskConstMeta(
     debugName: "github_retry_run",
-    argNames: ["token", "runId"],
+    argNames: ["token", "fullName", "runId"],
   );
 
   @override
