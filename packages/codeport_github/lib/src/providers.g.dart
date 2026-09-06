@@ -15,13 +15,13 @@ final repoListProvider = RepoListProvider._();
 final class RepoListProvider
     extends
         $FunctionalProvider<
-          AsyncValue<List<RepoSummary>>,
-          List<RepoSummary>,
-          FutureOr<List<RepoSummary>>
+          AsyncValue<List<GithubRepoUi>>,
+          List<GithubRepoUi>,
+          FutureOr<List<GithubRepoUi>>
         >
     with
-        $FutureModifier<List<RepoSummary>>,
-        $FutureProvider<List<RepoSummary>> {
+        $FutureModifier<List<GithubRepoUi>>,
+        $FutureProvider<List<GithubRepoUi>> {
   RepoListProvider._()
     : super(
         from: null,
@@ -38,17 +38,17 @@ final class RepoListProvider
 
   @$internal
   @override
-  $FutureProviderElement<List<RepoSummary>> $createElement(
+  $FutureProviderElement<List<GithubRepoUi>> $createElement(
     $ProviderPointer pointer,
   ) => $FutureProviderElement(pointer);
 
   @override
-  FutureOr<List<RepoSummary>> create(Ref ref) {
+  FutureOr<List<GithubRepoUi>> create(Ref ref) {
     return repoList(ref);
   }
 }
 
-String _$repoListHash() => r'e10ede27c4720fb39969acaf6c37a678232f5044';
+String _$repoListHash() => r'ec73233f818ba657f8680fd1e4b49727f1e0fca1';
 
 @ProviderFor(issueList)
 final issueListProvider = IssueListFamily._();
@@ -56,13 +56,13 @@ final issueListProvider = IssueListFamily._();
 final class IssueListProvider
     extends
         $FunctionalProvider<
-          AsyncValue<List<IssueSummary>>,
-          List<IssueSummary>,
-          FutureOr<List<IssueSummary>>
+          AsyncValue<List<GithubIssueUi>>,
+          List<GithubIssueUi>,
+          FutureOr<List<GithubIssueUi>>
         >
     with
-        $FutureModifier<List<IssueSummary>>,
-        $FutureProvider<List<IssueSummary>> {
+        $FutureModifier<List<GithubIssueUi>>,
+        $FutureProvider<List<GithubIssueUi>> {
   IssueListProvider._({
     required IssueListFamily super.from,
     required String super.argument,
@@ -86,12 +86,12 @@ final class IssueListProvider
 
   @$internal
   @override
-  $FutureProviderElement<List<IssueSummary>> $createElement(
+  $FutureProviderElement<List<GithubIssueUi>> $createElement(
     $ProviderPointer pointer,
   ) => $FutureProviderElement(pointer);
 
   @override
-  FutureOr<List<IssueSummary>> create(Ref ref) {
+  FutureOr<List<GithubIssueUi>> create(Ref ref) {
     final argument = this.argument as String;
     return issueList(ref, argument);
   }
@@ -107,10 +107,10 @@ final class IssueListProvider
   }
 }
 
-String _$issueListHash() => r'bd928d09f7d372c8955e5b6f80685e6ea8c7fad9';
+String _$issueListHash() => r'afe031b2bfeaaea5eb1c2e6d7722adc04290ff12';
 
 final class IssueListFamily extends $Family
-    with $FunctionalFamilyOverride<FutureOr<List<IssueSummary>>, String> {
+    with $FunctionalFamilyOverride<FutureOr<List<GithubIssueUi>>, String> {
   IssueListFamily._()
     : super(
         retry: null,
@@ -133,11 +133,13 @@ final runListProvider = RunListFamily._();
 final class RunListProvider
     extends
         $FunctionalProvider<
-          AsyncValue<List<RunSummary>>,
-          List<RunSummary>,
-          FutureOr<List<RunSummary>>
+          AsyncValue<List<GithubRunUi>>,
+          List<GithubRunUi>,
+          FutureOr<List<GithubRunUi>>
         >
-    with $FutureModifier<List<RunSummary>>, $FutureProvider<List<RunSummary>> {
+    with
+        $FutureModifier<List<GithubRunUi>>,
+        $FutureProvider<List<GithubRunUi>> {
   RunListProvider._({
     required RunListFamily super.from,
     required String super.argument,
@@ -161,12 +163,12 @@ final class RunListProvider
 
   @$internal
   @override
-  $FutureProviderElement<List<RunSummary>> $createElement(
+  $FutureProviderElement<List<GithubRunUi>> $createElement(
     $ProviderPointer pointer,
   ) => $FutureProviderElement(pointer);
 
   @override
-  FutureOr<List<RunSummary>> create(Ref ref) {
+  FutureOr<List<GithubRunUi>> create(Ref ref) {
     final argument = this.argument as String;
     return runList(ref, argument);
   }
@@ -182,10 +184,10 @@ final class RunListProvider
   }
 }
 
-String _$runListHash() => r'adf7f8d3489b052e72611268ae6cd8fbd262cbae';
+String _$runListHash() => r'0b6fe56c3ae44936c9e4ee252b54ed2a852acd72';
 
 final class RunListFamily extends $Family
-    with $FunctionalFamilyOverride<FutureOr<List<RunSummary>>, String> {
+    with $FunctionalFamilyOverride<FutureOr<List<GithubRunUi>>, String> {
   RunListFamily._()
     : super(
         retry: null,

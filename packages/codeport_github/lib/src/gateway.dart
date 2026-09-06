@@ -1,5 +1,9 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'data/bridge_gateway.dart';
+import 'data/frb_datasource.dart' show liveBridgeGateway;
+import 'domain/github_models.dart';
+
 class GithubGateway {
   const GithubGateway({
     required this.listRepos,
@@ -8,18 +12,18 @@ class GithubGateway {
     required this.retryRun,
   });
 
-  final Future<List<RepoSummary>> Function({
+  final Future<List<GithubRepo>> Function({
     required String token,
     required int page,
   })
   listRepos;
-  final Future<List<IssueSummary>> Function({
+  final Future<List<GithubIssue>> Function({
     required String token,
     required String fullName,
     String? state,
   })
   listIssues;
-  final Future<List<RunSummary>> Function({
+  final Future<List<GithubRun>> Function({
     required String token,
     required String fullName,
   })
@@ -36,20 +40,19 @@ final githubGatewayProvider = Provider<GithubGateway>((ref) {
   throw UnimplementedError('Override with a real or fake gateway');
 });
 
-class RepoSummary {
-  const RepoSummary({required this.fullName, required this.private});
-  final String fullName;
-  final bool private;
-}
+final bridgeGatewayProvider = Provider<BridgeGateway>((ref) {
+  return liveBridgeGateway();
+});
 
-class IssueSummary {
-  const IssueSummary({required this.number, required this.title});
-  final int number;
-  final String title;
-}
-
-class RunSummary {
-  const RunSummary({required this.runId, required this.status});
-  final int runId;
-  final String status;
+GithubGateway domainGateway(BridgeGateway bridge) {
+  return GithubGateway(
+    listRepos: ({required token, required page}) =>
+        bridge.fetchRepos(token: token, page: page),
+    listIssues: ({required token, required fullName, state}) =>
+        bridge.fetchIssues(token: token, fullName: fullName, state: state),
+    listRuns: ({required token, required fullName}) =>
+        bridge.fetchRuns(token: token, fullName: fullName),
+    retryRun: ({required token, required fullName, required runId}) =>
+        bridge.doRetry(token: token, fullName: fullName, runId: runId),
+  );
 }

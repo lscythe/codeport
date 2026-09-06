@@ -4,6 +4,16 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:codeport_github/codeport_github.dart';
 
+GithubRepo testRepo() {
+  return GithubRepo(
+    id: 1,
+    fullName: GithubFullName(owner: 'octocat', name: 'Hello-World'),
+    private: false,
+    stars: 80,
+    defaultBranch: 'main',
+  );
+}
+
 void main() {
   ProviderContainer makeContainer(GithubGateway gateway) {
     return ProviderContainer(
@@ -14,49 +24,64 @@ void main() {
     );
   }
 
-  const repos = [RepoSummary(fullName: 'octocat/Hello-World', private: false)];
+  GithubGateway fakeGateway({
+    Future<List<GithubRepo>> Function({
+      required String token,
+      required int page,
+    })?
+    listRepos,
+    Future<List<GithubIssue>> Function({
+      required String token,
+      required String fullName,
+      String? state,
+    })?
+    listIssues,
+    Future<List<GithubRun>> Function({
+      required String token,
+      required String fullName,
+    })?
+    listRuns,
+    Future<void> Function({
+      required String token,
+      required String fullName,
+      required int runId,
+    })?
+    retryRun,
+  }) {
+    return GithubGateway(
+      listRepos: listRepos ?? ({required token, required page}) async => [],
+      listIssues:
+          listIssues ??
+          ({required token, required fullName, state}) async => [],
+      listRuns: listRuns ?? ({required token, required fullName}) async => [],
+      retryRun:
+          retryRun ??
+          ({required token, required fullName, required runId}) async {},
+    );
+  }
 
   test('repoList loads first page through gateway', () async {
     final container = makeContainer(
-      GithubGateway(
+      fakeGateway(
         listRepos: ({required token, required page}) async {
           expect(token, 't');
           expect(page, 1);
-          return repos;
+          return [testRepo()];
         },
-        listIssues: ({required token, required fullName, state}) async => [],
-        listRuns: ({required token, required fullName}) async => [],
-        retryRun: ({
-          required token,
-          required fullName,
-          required runId,
-        }) async {},
       ),
     );
     addTearDown(container.dispose);
 
-    await expectLater(
-      container.read(repoListProvider.future),
-      completion(repos),
-    );
+    final repos = await container.read(repoListProvider.future);
+
+    expect(repos.single.fullName, 'octocat/Hello-World');
+    expect(repos.single.starsLabel, '80');
   });
 
   test('repoList surfaces auth failure when token is missing', () async {
     final container = ProviderContainer(
       overrides: [
-        githubGatewayProvider.overrideWithValue(
-          GithubGateway(
-            listRepos: ({required token, required page}) async => [],
-            listIssues: ({required token, required fullName, state}) async =>
-                [],
-            listRuns: ({required token, required fullName}) async => [],
-            retryRun: ({
-              required token,
-              required fullName,
-              required runId,
-            }) async {},
-          ),
-        ),
+        githubGatewayProvider.overrideWithValue(fakeGateway()),
         authTokenProvider.overrideWithValue(null),
       ],
     );
@@ -70,38 +95,44 @@ void main() {
   });
 
   test('issueList loads issues for the selected repo', () async {
-    const issues = [IssueSummary(number: 7, title: 'Bug')];
     final container = makeContainer(
-      GithubGateway(
-        listRepos: ({required token, required page}) async => [],
+      fakeGateway(
         listIssues: ({required token, required fullName, state}) async {
           expect(fullName, 'octocat/Hello-World');
-          return issues;
+          return [
+            GithubIssue(
+              id: 1,
+              number: 7,
+              title: 'Bug',
+              state: GithubIssueState.open,
+              labels: ['bug'],
+            ),
+          ];
         },
-        listRuns: ({required token, required fullName}) async => [],
-        retryRun: ({
-          required token,
-          required fullName,
-          required runId,
-        }) async {},
       ),
     );
     addTearDown(container.dispose);
 
-    await expectLater(
-      container.read(issueListProvider('octocat/Hello-World').future),
-      completion(issues),
+    final issues = await container.read(
+      issueListProvider('octocat/Hello-World').future,
     );
+
+    expect(issues.single.title, 'Bug');
+    expect(issues.single.stateLabel, 'Open');
   });
 
   test('runList loads runs and retryRun completes', () async {
-    const runs = [RunSummary(runId: 12, status: 'completed')];
     var retried = 0;
     final container = makeContainer(
-      GithubGateway(
-        listRepos: ({required token, required page}) async => [],
-        listIssues: ({required token, required fullName, state}) async => [],
-        listRuns: ({required token, required fullName}) async => runs,
+      fakeGateway(
+        listRuns: ({required token, required fullName}) async => [
+          GithubRun(
+            id: 12,
+            status: GithubRunStatus.completed,
+            conclusion: GithubRunConclusion.failure,
+            runNumber: 12,
+          ),
+        ],
         retryRun: ({required token, required fullName, required runId}) async {
           expect(runId, 12);
           retried++;
@@ -110,10 +141,10 @@ void main() {
     );
     addTearDown(container.dispose);
 
-    await expectLater(
-      container.read(runListProvider('o/r').future),
-      completion(runs),
-    );
+    final runs = await container.read(runListProvider('o/r').future);
+
+    expect(runs.single.statusLabel, 'Failed');
+    expect(runs.single.canRetry, isTrue);
     await container.read(retryRunProvider(fullName: 'o/r', runId: 12).future);
     expect(retried, 1);
   });

@@ -2,6 +2,7 @@ import 'package:codeport_core/codeport_core.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import 'gateway.dart';
+import 'ui/github_ui_models.dart';
 
 part 'providers.g.dart';
 
@@ -14,28 +15,33 @@ String _token(Ref ref) {
 }
 
 @Riverpod(keepAlive: true)
-Future<List<RepoSummary>> repoList(Ref ref) async {
+Future<List<GithubRepoUi>> repoList(Ref ref) async {
   final token = _token(ref);
   final gateway = ref.watch(githubGatewayProvider);
-  return UseCaseGuard.guard(() => gateway.listRepos(token: token, page: 1));
+  final repos = await UseCaseGuard.guard(
+    () => gateway.listRepos(token: token, page: 1),
+  );
+  return repos.map(GithubRepoUi.fromDomain).toList();
 }
 
 @Riverpod(keepAlive: true)
-Future<List<IssueSummary>> issueList(Ref ref, String fullName) async {
+Future<List<GithubIssueUi>> issueList(Ref ref, String fullName) async {
   final token = _token(ref);
   final gateway = ref.watch(githubGatewayProvider);
-  return UseCaseGuard.guard(
+  final issues = await UseCaseGuard.guard(
     () => gateway.listIssues(token: token, fullName: fullName),
   );
+  return issues.map(GithubIssueUi.fromDomain).toList();
 }
 
 @Riverpod(keepAlive: true)
-Future<List<RunSummary>> runList(Ref ref, String fullName) async {
+Future<List<GithubRunUi>> runList(Ref ref, String fullName) async {
   final token = _token(ref);
   final gateway = ref.watch(githubGatewayProvider);
-  return UseCaseGuard.guard(
+  final runs = await UseCaseGuard.guard(
     () => gateway.listRuns(token: token, fullName: fullName),
   );
+  return runs.map(GithubRunUi.fromDomain).toList();
 }
 
 @Riverpod(keepAlive: true)

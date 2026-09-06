@@ -1,4 +1,9 @@
+export 'src/auth_scope.dart';
+export 'src/base_notifier.dart';
 export 'src/failures.dart';
 export 'src/pagination.dart';
-export 'src/base_notifier.dart';
-export 'src/auth_scope.dart';
+export 'src/rust/api.dart';
+export 'src/rust/api/auth.dart';
+export 'src/rust/api/cicd.dart';
+export 'src/rust/api/issues.dart';
+export 'src/rust/api/repositories.dart';
