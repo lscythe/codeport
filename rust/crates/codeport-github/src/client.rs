@@ -21,4 +21,21 @@ impl GithubClient {
     pub fn auth_header(&self) -> String {
         format!("Bearer {}", self.token)
     }
+
+    pub fn repo_path(owner: &str, repo: &str) -> String {
+        format!("{owner}/{repo}")
+    }
+
+    pub fn map_status(status: u16, message: &str, rate_reset_at: Option<String>) -> CodeportError {
+        match status {
+            401 => CodeportError::Auth,
+            403 if rate_reset_at.is_some() => CodeportError::RateLimited {
+                reset_at: rate_reset_at.unwrap_or_default(),
+            },
+            403 => CodeportError::Auth,
+            404 => CodeportError::NotFound,
+            422 => CodeportError::Validation(message.to_string()),
+            _ => CodeportError::Network(message.to_string()),
+        }
+    }
 }

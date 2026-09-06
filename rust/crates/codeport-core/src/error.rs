@@ -4,7 +4,7 @@ use std::fmt;
 pub enum CodeportError {
     Auth,
     Network(String),
-    RateLimited { reset_at: u64 },
+    RateLimited { reset_at: String },
     NotFound,
     Validation(String),
 }
