@@ -1,0 +1,33 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  rust:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+      - run: cargo fmt --check --manifest-path rust/Cargo.toml
+      - run: cargo clippy --manifest-path rust/Cargo.toml --workspace --all-targets -- -D warnings
+      - run: cargo test --manifest-path rust/Cargo.toml --workspace
+
+  dart:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+      - run: dart format --output=none --set-exit-if-changed packages
+      - run: flutter pub get --directory=packages/codeport_core
+      - run: flutter analyze --no-pub --directory=packages/codeport_core
+      - run: flutter test --directory=packages/codeport_core
+      - run: flutter pub get --directory=packages/codeport_github
+      - run: flutter analyze --no-pub --directory=packages/codeport_github
+      - run: flutter test --directory=packages/codeport_github

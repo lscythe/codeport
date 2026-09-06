@@ -2,7 +2,6 @@ pub mod auth;
 pub mod cicd;
 pub mod issues;
 pub mod repositories;
-pub mod simple;
 
 #[flutter_rust_bridge::frb(mirror(Repo))]
 pub struct _RepoMirror {
