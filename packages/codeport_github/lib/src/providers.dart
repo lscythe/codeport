@@ -48,6 +48,23 @@ Future<List<GithubRunUi>> runList(Ref ref, String fullName) async {
 }
 
 @Riverpod(keepAlive: true)
+Stream<GithubRunUi> runWatch(Ref ref, String fullName, int runId) async* {
+  final token = _token(ref);
+  final gateway = ref.watch(githubGatewayProvider);
+  try {
+    await for (final run in gateway.watchRun(
+      token: token,
+      fullName: fullName,
+      runId: runId,
+    )) {
+      yield GithubRunUi.fromDomain(run);
+    }
+  } catch (e) {
+    throw AppFailure.fromRust(e);
+  }
+}
+
+@Riverpod(keepAlive: true)
 Future<void> retryRun(
   Ref ref, {
   required String fullName,

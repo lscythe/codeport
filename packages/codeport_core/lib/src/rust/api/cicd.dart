@@ -8,6 +8,8 @@ import '../frb_generated.dart';
 
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
+// These functions are ignored because they are not marked as `pub`: `github_poll_run`, `github_watch_run_with`
+
 Future<List<Pipeline>> githubListRuns({
   required String token,
   required String fullName,
@@ -41,6 +43,16 @@ Future<void> githubRetryRun({
   required String fullName,
   required BigInt runId,
 }) => RustLib.instance.api.crateApiCicdGithubRetryRun(
+  token: token,
+  fullName: fullName,
+  runId: runId,
+);
+
+Stream<Pipeline> githubWatchRun({
+  required String token,
+  required String fullName,
+  required BigInt runId,
+}) => RustLib.instance.api.crateApiCicdGithubWatchRun(
   token: token,
   fullName: fullName,
   runId: runId,

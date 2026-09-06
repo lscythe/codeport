@@ -47,6 +47,12 @@ void main() {
       required int runId,
     })?
     retryRun,
+    Stream<GithubRun> Function({
+      required String token,
+      required String fullName,
+      required int runId,
+    })?
+    watchRun,
   }) {
     GithubRepo stubRepo() => GithubRepo(
       id: 0,
@@ -70,6 +76,10 @@ void main() {
       retryRun:
           retryRun ??
           ({required token, required fullName, required runId}) async {},
+      watchRun:
+          watchRun ??
+          ({required token, required fullName, required runId}) =>
+              const Stream.empty(),
       getRepo: ({required token, required fullName}) async => stubRepo(),
       listCommits: ({required token, required fullName}) async => [],
       getIssue: ({
@@ -254,5 +264,35 @@ void main() {
 
     final jobs = await container.read(jobListProvider('o/r', 0).future);
     expect(jobs, isEmpty);
+  });
+
+  test('runWatch streams status updates', () async {
+    final container = makeContainer(
+      fakeGateway(
+        watchRun: ({required token, required fullName, required runId}) =>
+            Stream.fromIterable([
+              GithubRun(
+                id: runId,
+                status: GithubRunStatus.inProgress,
+                runNumber: 12,
+              ),
+              GithubRun(
+                id: runId,
+                status: GithubRunStatus.completed,
+                conclusion: GithubRunConclusion.success,
+                runNumber: 12,
+              ),
+            ]),
+      ),
+    );
+    addTearDown(container.dispose);
+
+    final seen = <String>[];
+    container.listen(runWatchProvider('o/r', 12), (_, next) {
+      next.whenData((ui) => seen.add(ui.statusLabel));
+    });
+    await Future<void>.delayed(const Duration(milliseconds: 100));
+
+    expect(seen, ['In progress', 'Passed']);
   });
 }

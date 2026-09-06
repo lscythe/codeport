@@ -76,6 +76,25 @@ Future<void> liveRetryRun({
   );
 }
 
+Stream<GithubRunDto> liveWatchRun({
+  required String token,
+  required String fullName,
+  required int runId,
+}) {
+  return githubWatchRun(
+    token: token,
+    fullName: fullName,
+    runId: BigInt.from(runId),
+  ).map(
+    (r) => GithubRunDto(
+      id: r.id.toInt(),
+      status: r.status.name,
+      conclusion: r.conclusion?.name,
+      runNumber: r.runNumber.toInt(),
+    ),
+  );
+}
+
 Future<GithubRepoDto> liveFetchRepo({
   required String token,
   required String fullName,
@@ -267,6 +286,7 @@ BridgeGateway liveBridgeGateway() {
     fetchIssueList: liveFetchIssues,
     fetchRunList: liveFetchRuns,
     retryRun: liveRetryRun,
+    watchRun: liveWatchRun,
     fetchSingleRepo: liveFetchRepo,
     fetchCommitList: liveFetchCommits,
     fetchSingleIssue: liveFetchIssue,

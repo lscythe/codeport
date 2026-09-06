@@ -12,3 +12,4 @@ pub mod issues;
 pub mod pagination;
 pub mod repos;
 pub mod store;
+pub mod watch;

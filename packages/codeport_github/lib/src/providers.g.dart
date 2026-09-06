@@ -204,6 +204,81 @@ final class RunListFamily extends $Family
   String toString() => r'runListProvider';
 }
 
+@ProviderFor(runWatch)
+final runWatchProvider = RunWatchFamily._();
+
+final class RunWatchProvider
+    extends
+        $FunctionalProvider<
+          AsyncValue<GithubRunUi>,
+          GithubRunUi,
+          Stream<GithubRunUi>
+        >
+    with $FutureModifier<GithubRunUi>, $StreamProvider<GithubRunUi> {
+  RunWatchProvider._({
+    required RunWatchFamily super.from,
+    required (String, int) super.argument,
+  }) : super(
+         retry: null,
+         name: r'runWatchProvider',
+         isAutoDispose: false,
+         dependencies: null,
+         $allTransitiveDependencies: null,
+       );
+
+  @override
+  String debugGetCreateSourceHash() => _$runWatchHash();
+
+  @override
+  String toString() {
+    return r'runWatchProvider'
+        ''
+        '$argument';
+  }
+
+  @$internal
+  @override
+  $StreamProviderElement<GithubRunUi> $createElement(
+    $ProviderPointer pointer,
+  ) => $StreamProviderElement(pointer);
+
+  @override
+  Stream<GithubRunUi> create(Ref ref) {
+    final argument = this.argument as (String, int);
+    return runWatch(ref, argument.$1, argument.$2);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is RunWatchProvider && other.argument == argument;
+  }
+
+  @override
+  int get hashCode {
+    return argument.hashCode;
+  }
+}
+
+String _$runWatchHash() => r'e624d0e9756642bc99694727862bc6a14ad67836';
+
+final class RunWatchFamily extends $Family
+    with $FunctionalFamilyOverride<Stream<GithubRunUi>, (String, int)> {
+  RunWatchFamily._()
+    : super(
+        retry: null,
+        name: r'runWatchProvider',
+        dependencies: null,
+        $allTransitiveDependencies: null,
+        isAutoDispose: false,
+      );
+
+  RunWatchProvider call(String fullName, int runId) =>
+      RunWatchProvider._(argument: (fullName, runId), from: this);
+
+  @override
+  String toString() => r'runWatchProvider';
+}
+
 @ProviderFor(retryRun)
 final retryRunProvider = RetryRunFamily._();
 

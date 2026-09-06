@@ -25,6 +25,12 @@ typedef RetryRun = Future<void> Function({
   required int runId,
 });
 
+typedef WatchRun = Stream<GithubRunDto> Function({
+  required String token,
+  required String fullName,
+  required int runId,
+});
+
 typedef FetchCommits = Future<List<GithubCommitDto>> Function({
   required String token,
   required String fullName,
@@ -84,6 +90,7 @@ BridgeGateway emptyBridge({
   FetchIssues? fetchIssues,
   FetchRuns? fetchRuns,
   RetryRun? retryRun,
+  WatchRun? watchRun,
   FetchRepo? fetchRepo,
   FetchCommits? fetchCommits,
   FetchIssue? fetchIssue,
@@ -113,6 +120,11 @@ BridgeGateway emptyBridge({
     required String fullName,
     required int runId,
   }) async {}
+  Stream<GithubRunDto> noWatch({
+    required String token,
+    required String fullName,
+    required int runId,
+  }) => const Stream.empty();
   Future<GithubRepoDto> noRepo({
     required String token,
     required String fullName,
@@ -164,6 +176,7 @@ BridgeGateway emptyBridge({
     fetchIssueList: fetchIssues ?? noIssues,
     fetchRunList: fetchRuns ?? noRuns,
     retryRun: retryRun ?? noRetry,
+    watchRun: watchRun ?? noWatch,
     fetchSingleRepo: fetchRepo ?? noRepo,
     fetchCommitList: fetchCommits ?? noCommits,
     fetchSingleIssue: fetchIssue ?? noIssue,
@@ -183,6 +196,7 @@ class BridgeGateway {
     required FetchIssues fetchIssueList,
     required FetchRuns fetchRunList,
     required RetryRun retryRun,
+    required WatchRun watchRun,
     required FetchRepo fetchSingleRepo,
     required FetchCommits fetchCommitList,
     required FetchIssue fetchSingleIssue,
@@ -198,6 +212,8 @@ class BridgeGateway {
        _listRuns = fetchRunList,
        // ignore: prefer_initializing_formals
        _retryRun = retryRun,
+       // ignore: prefer_initializing_formals
+       _watchRun = watchRun,
        _fetchRepo = fetchSingleRepo,
        _fetchCommits = fetchCommitList,
        _fetchIssue = fetchSingleIssue,
@@ -213,6 +229,7 @@ class BridgeGateway {
   final FetchIssues _listIssues;
   final FetchRuns _listRuns;
   final RetryRun _retryRun;
+  final WatchRun _watchRun;
   final FetchRepo _fetchRepo;
   final FetchCommits _fetchCommits;
   final FetchIssue _fetchIssue;
@@ -262,6 +279,18 @@ class BridgeGateway {
     required int runId,
   }) {
     return _retryRun(token: token, fullName: fullName, runId: runId);
+  }
+
+  Stream<GithubRun> watchRun({
+    required String token,
+    required String fullName,
+    required int runId,
+  }) {
+    return _watchRun(
+      token: token,
+      fullName: fullName,
+      runId: runId,
+    ).map((dto) => dto.toDomain());
   }
 
   Future<GithubRepo> fetchRepo({

@@ -11,6 +11,7 @@ class GithubGateway {
     required this.listIssues,
     required this.listRuns,
     required this.retryRun,
+    required this.watchRun,
     required this.getRepo,
     required this.listCommits,
     required this.getIssue,
@@ -44,6 +45,12 @@ class GithubGateway {
     required int runId,
   })
   retryRun;
+  final Stream<GithubRun> Function({
+    required String token,
+    required String fullName,
+    required int runId,
+  })
+  watchRun;
   final Future<GithubRepo> Function({
     required String token,
     required String fullName,
@@ -131,6 +138,8 @@ GithubGateway domainGateway(BridgeGateway bridge) {
         bridge.fetchRuns(token: token, fullName: fullName),
     retryRun: ({required token, required fullName, required runId}) =>
         bridge.doRetry(token: token, fullName: fullName, runId: runId),
+    watchRun: ({required token, required fullName, required int runId}) =>
+        bridge.watchRun(token: token, fullName: fullName, runId: runId),
     getRepo: ({required token, required fullName}) =>
         bridge.fetchRepo(token: token, fullName: fullName),
     listCommits: ({required token, required fullName}) =>
