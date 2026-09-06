@@ -74,7 +74,7 @@ void main() {
       doRetry: ({required token, required fullName, required runId}) async {},
     );
 
-    expect(await gateway.fetchRepos(token: 't', page: 1), isEmpty);
+    expect((await gateway.fetchRepoPage(token: 't', page: 1)).items, isEmpty);
     expect(await gateway.fetchIssues(token: 't', fullName: 'o/r'), isEmpty);
     expect(await gateway.fetchRuns(token: 't', fullName: 'o/r'), isEmpty);
   });
@@ -99,7 +99,8 @@ void main() {
       retryRun: ({required token, required fullName, required runId}) async {},
     );
 
-    final dtos = await source.asFetchRepos(token: 't', page: 2);
+    final result = await source.asFetchRepos(token: 't', page: 2);
+    final dtos = result.repos;
 
     expect(sawPage, 2);
     expect(dtos.single, isA<GithubRepoDto>());

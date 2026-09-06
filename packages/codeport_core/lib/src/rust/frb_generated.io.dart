@@ -36,6 +36,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   PipelineConclusion dco_decode_box_autoadd_pipeline_conclusion(dynamic raw);
 
   @protected
+  int dco_decode_box_autoadd_u_32(dynamic raw);
+
+  @protected
   CodeportError dco_decode_codeport_error(dynamic raw);
 
   @protected
@@ -71,6 +74,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  int? dco_decode_opt_box_autoadd_u_32(dynamic raw);
+
+  @protected
   Pipeline dco_decode_pipeline(dynamic raw);
 
   @protected
@@ -81,6 +87,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   Repo dco_decode_repo(dynamic raw);
+
+  @protected
+  RepoPage dco_decode_repo_page(dynamic raw);
 
   @protected
   int dco_decode_u_32(dynamic raw);
@@ -104,6 +113,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   PipelineConclusion sse_decode_box_autoadd_pipeline_conclusion(
     SseDeserializer deserializer,
   );
+
+  @protected
+  int sse_decode_box_autoadd_u_32(SseDeserializer deserializer);
 
   @protected
   CodeportError sse_decode_codeport_error(SseDeserializer deserializer);
@@ -141,6 +153,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  int? sse_decode_opt_box_autoadd_u_32(SseDeserializer deserializer);
+
+  @protected
   Pipeline sse_decode_pipeline(SseDeserializer deserializer);
 
   @protected
@@ -153,6 +168,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   Repo sse_decode_repo(SseDeserializer deserializer);
+
+  @protected
+  RepoPage sse_decode_repo_page(SseDeserializer deserializer);
 
   @protected
   int sse_decode_u_32(SseDeserializer deserializer);
@@ -177,6 +195,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
     PipelineConclusion self,
     SseSerializer serializer,
   );
+
+  @protected
+  void sse_encode_box_autoadd_u_32(int self, SseSerializer serializer);
 
   @protected
   void sse_encode_codeport_error(CodeportError self, SseSerializer serializer);
@@ -218,6 +239,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  void sse_encode_opt_box_autoadd_u_32(int? self, SseSerializer serializer);
+
+  @protected
   void sse_encode_pipeline(Pipeline self, SseSerializer serializer);
 
   @protected
@@ -234,6 +258,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   void sse_encode_repo(Repo self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_repo_page(RepoPage self, SseSerializer serializer);
 
   @protected
   void sse_encode_u_32(int self, SseSerializer serializer);

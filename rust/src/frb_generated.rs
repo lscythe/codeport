@@ -329,6 +329,11 @@ const _: fn() = || {
         let _: u64 = Repo.stars;
         let _: String = Repo.default_branch;
     }
+    {
+        let RepoPage = None::<crate::api::RepoPage>.unwrap();
+        let _: Vec<crate::api::Repo> = RepoPage.repos;
+        let _: Option<u32> = RepoPage.next_page;
+    }
 };
 
 // Section: dart2rust
@@ -499,6 +504,17 @@ impl SseDecode for Option<crate::api::PipelineConclusion> {
     }
 }
 
+impl SseDecode for Option<u32> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        if (<bool>::sse_decode(deserializer)) {
+            return Some(<u32>::sse_decode(deserializer));
+        } else {
+            return None;
+        }
+    }
+}
+
 impl SseDecode for crate::api::Pipeline {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
@@ -555,6 +571,18 @@ impl SseDecode for crate::api::Repo {
             private: var_private,
             stars: var_stars,
             default_branch: var_defaultBranch,
+        };
+    }
+}
+
+impl SseDecode for crate::api::RepoPage {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut var_repos = <Vec<crate::api::Repo>>::sse_decode(deserializer);
+        let mut var_nextPage = <Option<u32>>::sse_decode(deserializer);
+        return crate::api::RepoPage {
+            repos: var_repos,
+            next_page: var_nextPage,
         };
     }
 }
@@ -780,6 +808,25 @@ impl flutter_rust_bridge::IntoIntoDart<FrbWrapper<crate::api::Repo>> for crate::
         self.into()
     }
 }
+// Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for FrbWrapper<crate::api::RepoPage> {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        [
+            self.0.repos.into_into_dart().into_dart(),
+            self.0.next_page.into_into_dart().into_dart(),
+        ]
+        .into_dart()
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for FrbWrapper<crate::api::RepoPage>
+{
+}
+impl flutter_rust_bridge::IntoIntoDart<FrbWrapper<crate::api::RepoPage>> for crate::api::RepoPage {
+    fn into_into_dart(self) -> FrbWrapper<crate::api::RepoPage> {
+        self.into()
+    }
+}
 
 impl SseEncode for String {
     // Codec=Sse (Serialization based), see doc to use other codecs
@@ -928,6 +975,16 @@ impl SseEncode for Option<crate::api::PipelineConclusion> {
     }
 }
 
+impl SseEncode for Option<u32> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <bool>::sse_encode(self.is_some(), serializer);
+        if let Some(value) = self {
+            <u32>::sse_encode(value, serializer);
+        }
+    }
+}
+
 impl SseEncode for crate::api::Pipeline {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
@@ -980,6 +1037,14 @@ impl SseEncode for crate::api::Repo {
         <bool>::sse_encode(self.private, serializer);
         <u64>::sse_encode(self.stars, serializer);
         <String>::sse_encode(self.default_branch, serializer);
+    }
+}
+
+impl SseEncode for crate::api::RepoPage {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <Vec<crate::api::Repo>>::sse_encode(self.repos, serializer);
+        <Option<u32>>::sse_encode(self.next_page, serializer);
     }
 }
 

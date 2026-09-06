@@ -59,10 +59,17 @@ pub enum _CodeportErrorMirror {
     Validation(String),
 }
 
+#[flutter_rust_bridge::frb(mirror(RepoPage))]
+pub struct _RepoPageMirror {
+    pub repos: Vec<Repo>,
+    pub next_page: Option<u32>,
+}
+
 pub use codeport_core::entities::{
     Issue, IssueState, Pipeline, PipelineConclusion, PipelineStatus, Repo,
 };
 pub use codeport_core::error::CodeportError;
+pub use repositories::RepoPage;
 
 pub(crate) fn validate_full_name(full_name: &str) -> Result<(), CodeportError> {
     let mut parts = full_name.split('/');

@@ -8,10 +8,10 @@ import '../frb_generated.dart';
 
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-Future<List<Repo>> githubListRepos({
-  required String token,
-  required int page,
-}) => RustLib.instance.api.crateApiRepositoriesGithubListRepos(
-  token: token,
-  page: page,
-);
+// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `fmt`
+
+Future<RepoPage> githubListRepos({required String token, required int page}) =>
+    RustLib.instance.api.crateApiRepositoriesGithubListRepos(
+      token: token,
+      page: page,
+    );

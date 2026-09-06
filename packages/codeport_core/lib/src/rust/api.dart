@@ -127,3 +127,21 @@ class Repo {
           stars == other.stars &&
           defaultBranch == other.defaultBranch;
 }
+
+class RepoPage {
+  final List<Repo> repos;
+  final int? nextPage;
+
+  const RepoPage({required this.repos, this.nextPage});
+
+  @override
+  int get hashCode => repos.hashCode ^ nextPage.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is RepoPage &&
+          runtimeType == other.runtimeType &&
+          repos == other.repos &&
+          nextPage == other.nextPage;
+}

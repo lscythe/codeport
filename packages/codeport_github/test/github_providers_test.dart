@@ -25,11 +25,11 @@ void main() {
   }
 
   GithubGateway fakeGateway({
-    Future<List<GithubRepo>> Function({
+    Future<Page<GithubRepo>> Function({
       required String token,
       required int page,
     })?
-    listRepos,
+    listRepoPage,
     Future<List<GithubIssue>> Function({
       required String token,
       required String fullName,
@@ -49,7 +49,10 @@ void main() {
     retryRun,
   }) {
     return GithubGateway(
-      listRepos: listRepos ?? ({required token, required page}) async => [],
+      listRepoPage:
+          listRepoPage ??
+          ({required token, required page}) async =>
+              const Page(items: [], nextCursor: null),
       listIssues:
           listIssues ??
           ({required token, required fullName, state}) async => [],
@@ -63,10 +66,10 @@ void main() {
   test('repoList loads first page through gateway', () async {
     final container = makeContainer(
       fakeGateway(
-        listRepos: ({required token, required page}) async {
+        listRepoPage: ({required token, required page}) async {
           expect(token, 't');
           expect(page, 1);
-          return [testRepo()];
+          return Page(items: [testRepo()], nextCursor: null);
         },
       ),
     );
@@ -76,6 +79,27 @@ void main() {
 
     expect(repos.single.fullName, 'octocat/Hello-World');
     expect(repos.single.starsLabel, '80');
+  });
+
+  test('repoList collects all pages through cursor', () async {
+    final seenPages = <int>[];
+    final container = makeContainer(
+      fakeGateway(
+        listRepoPage: ({required token, required page}) async {
+          seenPages.add(page);
+          if (page == 1) {
+            return Page(items: [testRepo()], nextCursor: 2);
+          }
+          return const Page(items: [], nextCursor: null);
+        },
+      ),
+    );
+    addTearDown(container.dispose);
+
+    final repos = await container.read(repoListProvider.future);
+
+    expect(seenPages, [1, 2]);
+    expect(repos.single.fullName, 'octocat/Hello-World');
   });
 
   test('repoList surfaces auth failure when token is missing', () async {

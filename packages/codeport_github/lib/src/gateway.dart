@@ -1,3 +1,4 @@
+import 'package:codeport_core/codeport_core.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'data/bridge_gateway.dart';
@@ -6,17 +7,17 @@ import 'domain/github_models.dart';
 
 class GithubGateway {
   const GithubGateway({
-    required this.listRepos,
+    required this.listRepoPage,
     required this.listIssues,
     required this.listRuns,
     required this.retryRun,
   });
 
-  final Future<List<GithubRepo>> Function({
+  final Future<Page<GithubRepo>> Function({
     required String token,
     required int page,
   })
-  listRepos;
+  listRepoPage;
   final Future<List<GithubIssue>> Function({
     required String token,
     required String fullName,
@@ -46,8 +47,8 @@ final bridgeGatewayProvider = Provider<BridgeGateway>((ref) {
 
 GithubGateway domainGateway(BridgeGateway bridge) {
   return GithubGateway(
-    listRepos: ({required token, required page}) =>
-        bridge.fetchRepos(token: token, page: page),
+    listRepoPage: ({required token, required page}) =>
+        bridge.fetchRepoPage(token: token, page: page),
     listIssues: ({required token, required fullName, state}) =>
         bridge.fetchIssues(token: token, fullName: fullName, state: state),
     listRuns: ({required token, required fullName}) =>

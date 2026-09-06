@@ -17,13 +17,15 @@ void main() {
     ];
 
     final gateway = BridgeGateway(
-      fetchRepos: ({required token, required page}) async => dtos,
+      fetchRepos: ({required token, required page}) async =>
+          GithubRepoPage(repos: dtos),
       fetchIssues: ({required token, required fullName, state}) async => [],
       fetchRuns: ({required token, required fullName}) async => [],
       doRetry: ({required token, required fullName, required runId}) async {},
     );
 
-    final repos = await gateway.fetchRepos(token: 't', page: 1);
+    final page = await gateway.fetchRepoPage(token: 't', page: 1);
+    final repos = page.items;
 
     expect(repos.single.fullName.value, 'octocat/Hello-World');
     expect(repos.single.stars, 80);
@@ -43,7 +45,8 @@ void main() {
     ];
 
     final gateway = BridgeGateway(
-      fetchRepos: ({required token, required page}) async => [],
+      fetchRepos: ({required token, required page}) async =>
+          const GithubRepoPage(repos: []),
       fetchIssues: ({required token, required fullName, state}) async {
         expect(fullName, 'o/r');
         return issueDtos;

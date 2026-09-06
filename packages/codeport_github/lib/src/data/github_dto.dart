@@ -1,5 +1,12 @@
 import '../domain/github_models.dart';
 
+class GithubRepoPage {
+  const GithubRepoPage({required this.repos, this.nextPage});
+
+  final List<GithubRepoDto> repos;
+  final int? nextPage;
+}
+
 class GithubRepoDto {
   const GithubRepoDto({
     required this.id,

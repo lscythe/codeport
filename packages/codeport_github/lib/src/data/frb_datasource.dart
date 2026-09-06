@@ -3,22 +3,25 @@ import 'package:codeport_core/codeport_core.dart';
 import 'bridge_gateway.dart';
 import 'github_dto.dart';
 
-Future<List<GithubRepoDto>> liveFetchRepos({
+Future<GithubRepoPage> liveFetchRepos({
   required String token,
   required int page,
 }) async {
-  final repos = await githubListRepos(token: token, page: page);
-  return repos
-      .map(
-        (r) => GithubRepoDto(
-          id: r.id.toInt(),
-          fullName: r.fullName,
-          private: r.private,
-          stars: r.stars.toInt(),
-          defaultBranch: r.defaultBranch,
-        ),
-      )
-      .toList();
+  final result = await githubListRepos(token: token, page: page);
+  return GithubRepoPage(
+    repos: result.repos
+        .map(
+          (r) => GithubRepoDto(
+            id: r.id.toInt(),
+            fullName: r.fullName,
+            private: r.private,
+            stars: r.stars.toInt(),
+            defaultBranch: r.defaultBranch,
+          ),
+        )
+        .toList(),
+    nextPage: result.nextPage?.toInt(),
+  );
 }
 
 Future<List<GithubIssueDto>> liveFetchIssues({
@@ -161,17 +164,19 @@ class FrbGithubDataSource {
 
   FetchRepos get asFetchRepos => ({required token, required page}) async {
     final records = await listRepos(token: token, page: page);
-    return records
-        .map(
-          (r) => GithubRepoDto(
-            id: r.id.toInt(),
-            fullName: r.fullName,
-            private: r.private,
-            stars: r.stars.toInt(),
-            defaultBranch: r.defaultBranch,
-          ),
-        )
-        .toList();
+    return GithubRepoPage(
+      repos: records
+          .map(
+            (r) => GithubRepoDto(
+              id: r.id.toInt(),
+              fullName: r.fullName,
+              private: r.private,
+              stars: r.stars.toInt(),
+              defaultBranch: r.defaultBranch,
+            ),
+          )
+          .toList(),
+    );
   };
 
   FetchIssues get asFetchIssues =>

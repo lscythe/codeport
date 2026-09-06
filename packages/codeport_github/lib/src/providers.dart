@@ -19,7 +19,10 @@ Future<List<GithubRepoUi>> repoList(Ref ref) async {
   final token = _token(ref);
   final gateway = ref.watch(githubGatewayProvider);
   final repos = await UseCaseGuard.guard(
-    () => gateway.listRepos(token: token, page: 1),
+    () => CursorPaginator.collect(
+      (cursor) => gateway.listRepoPage(token: token, page: cursor),
+      firstCursor: 1,
+    ),
   );
   return repos.map(GithubRepoUi.fromDomain).toList();
 }

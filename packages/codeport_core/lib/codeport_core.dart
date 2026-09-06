@@ -2,6 +2,7 @@ export 'src/auth_scope.dart';
 export 'src/base_notifier.dart';
 export 'src/failures.dart';
 export 'src/pagination.dart';
+export 'src/token_storage.dart';
 export 'src/rust/api.dart';
 export 'src/rust/api/auth.dart';
 export 'src/rust/api/cicd.dart';

@@ -3,9 +3,16 @@ use codeport_core::error::CodeportError;
 use codeport_github::http::BlockingHttp;
 use codeport_github::store::GithubStore;
 
-pub fn github_list_repos(token: String, page: u32) -> Result<Vec<Repo>, CodeportError> {
+#[derive(Debug)]
+pub struct RepoPage {
+    pub repos: Vec<Repo>,
+    pub next_page: Option<u32>,
+}
+
+pub fn github_list_repos(token: String, page: u32) -> Result<RepoPage, CodeportError> {
     let store = GithubStore::new(token, BlockingHttp::new())?;
-    Ok(store.list_repos(page)?.0)
+    let (repos, next_page) = store.list_repos(page)?;
+    Ok(RepoPage { repos, next_page })
 }
 
 #[cfg(test)]

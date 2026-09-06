@@ -92,7 +92,7 @@ abstract class RustLibApi extends BaseApi {
     String? state,
   });
 
-  Future<List<Repo>> crateApiRepositoriesGithubListRepos({
+  Future<RepoPage> crateApiRepositoriesGithubListRepos({
     required String token,
     required int page,
   });
@@ -161,7 +161,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<List<Repo>> crateApiRepositoriesGithubListRepos({
+  Future<RepoPage> crateApiRepositoriesGithubListRepos({
     required String token,
     required int page,
   }) {
@@ -179,7 +179,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           );
         },
         codec: SseCodec(
-          decodeSuccessData: sse_decode_list_repo,
+          decodeSuccessData: sse_decode_repo_page,
           decodeErrorData: sse_decode_codeport_error,
         ),
         constMeta: kCrateApiRepositoriesGithubListReposConstMeta,
@@ -362,6 +362,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  int dco_decode_box_autoadd_u_32(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw as int;
+  }
+
+  @protected
   CodeportError dco_decode_codeport_error(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     switch (raw[0]) {
@@ -452,6 +458,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  int? dco_decode_opt_box_autoadd_u_32(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw == null ? null : dco_decode_box_autoadd_u_32(raw);
+  }
+
+  @protected
   Pipeline dco_decode_pipeline(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
@@ -489,6 +501,18 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       private: dco_decode_bool(arr[2]),
       stars: dco_decode_u_64(arr[3]),
       defaultBranch: dco_decode_String(arr[4]),
+    );
+  }
+
+  @protected
+  RepoPage dco_decode_repo_page(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 2)
+      throw Exception('unexpected arr length: expect 2 but see ${arr.length}');
+    return RepoPage(
+      repos: dco_decode_list_repo(arr[0]),
+      nextPage: dco_decode_opt_box_autoadd_u_32(arr[1]),
     );
   }
 
@@ -535,6 +559,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return (sse_decode_pipeline_conclusion(deserializer));
+  }
+
+  @protected
+  int sse_decode_box_autoadd_u_32(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_u_32(deserializer));
   }
 
   @protected
@@ -671,6 +701,17 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  int? sse_decode_opt_box_autoadd_u_32(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    if (sse_decode_bool(deserializer)) {
+      return (sse_decode_box_autoadd_u_32(deserializer));
+    } else {
+      return null;
+    }
+  }
+
+  @protected
   Pipeline sse_decode_pipeline(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var var_id = sse_decode_u_64(deserializer);
@@ -721,6 +762,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  RepoPage sse_decode_repo_page(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_repos = sse_decode_list_repo(deserializer);
+    var var_nextPage = sse_decode_opt_box_autoadd_u_32(deserializer);
+    return RepoPage(repos: var_repos, nextPage: var_nextPage);
+  }
+
+  @protected
   int sse_decode_u_32(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return deserializer.buffer.getUint32();
@@ -762,6 +811,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_pipeline_conclusion(self, serializer);
+  }
+
+  @protected
+  void sse_encode_box_autoadd_u_32(int self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_u_32(self, serializer);
   }
 
   @protected
@@ -876,6 +931,16 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_opt_box_autoadd_u_32(int? self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    sse_encode_bool(self != null, serializer);
+    if (self != null) {
+      sse_encode_box_autoadd_u_32(self, serializer);
+    }
+  }
+
+  @protected
   void sse_encode_pipeline(Pipeline self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_u_64(self.id, serializer);
@@ -910,6 +975,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_bool(self.private, serializer);
     sse_encode_u_64(self.stars, serializer);
     sse_encode_String(self.defaultBranch, serializer);
+  }
+
+  @protected
+  void sse_encode_repo_page(RepoPage self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_list_repo(self.repos, serializer);
+    sse_encode_opt_box_autoadd_u_32(self.nextPage, serializer);
   }
 
   @protected

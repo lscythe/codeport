@@ -1,7 +1,9 @@
+import 'package:codeport_core/codeport_core.dart';
+
 import '../domain/github_models.dart';
 import 'github_dto.dart';
 
-typedef FetchRepos = Future<List<GithubRepoDto>> Function({
+typedef FetchRepos = Future<GithubRepoPage> Function({
   required String token,
   required int page,
 });
@@ -39,12 +41,15 @@ class BridgeGateway {
   final FetchRuns _listRuns;
   final RetryRun _retryRun;
 
-  Future<List<GithubRepo>> fetchRepos({
+  Future<Page<GithubRepo>> fetchRepoPage({
     required String token,
     required int page,
   }) async {
-    final dtos = await _listRepos(token: token, page: page);
-    return dtos.map((dto) => dto.toDomain()).toList();
+    final result = await _listRepos(token: token, page: page);
+    return Page(
+      items: result.repos.map((dto) => dto.toDomain()).toList(),
+      nextCursor: result.nextPage,
+    );
   }
 
   Future<List<GithubIssue>> fetchIssues({
