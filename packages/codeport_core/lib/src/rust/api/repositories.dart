@@ -13,3 +13,17 @@ Future<RepoPage> githubListRepos({required String token, required int page}) =>
       token: token,
       page: page,
     );
+
+Future<Repo> githubGetRepo({required String token, required String fullName}) =>
+    RustLib.instance.api.crateApiRepositoriesGithubGetRepo(
+      token: token,
+      fullName: fullName,
+    );
+
+Future<List<Commit>> githubListCommits({
+  required String token,
+  required String fullName,
+}) => RustLib.instance.api.crateApiRepositoriesGithubListCommits(
+  token: token,
+  fullName: fullName,
+);

@@ -16,12 +16,9 @@ void main() {
       ),
     ];
 
-    final gateway = BridgeGateway(
+    final gateway = emptyBridge(
       fetchRepos: ({required token, required page}) async =>
           GithubRepoPage(repos: dtos),
-      fetchIssues: ({required token, required fullName, state}) async => [],
-      fetchRuns: ({required token, required fullName}) async => [],
-      doRetry: ({required token, required fullName, required runId}) async {},
     );
 
     final page = await gateway.fetchRepoPage(token: 't', page: 1);
@@ -44,15 +41,12 @@ void main() {
       ),
     ];
 
-    final gateway = BridgeGateway(
-      fetchRepos: ({required token, required page}) async =>
-          const GithubRepoPage(repos: []),
+    final gateway = emptyBridge(
       fetchIssues: ({required token, required fullName, state}) async {
         expect(fullName, 'o/r');
         return issueDtos;
       },
       fetchRuns: ({required token, required fullName}) async => runDtos,
-      doRetry: ({required token, required fullName, required runId}) async {},
     );
 
     final issues = await gateway.fetchIssues(token: 't', fullName: 'o/r');
@@ -60,5 +54,95 @@ void main() {
 
     expect(issues.single.state, GithubIssueState.open);
     expect(runs.single.canRetry, isTrue);
+  });
+
+  test('fetches issue detail with comments', () async {
+    final gateway = emptyBridge(
+      fetchIssue:
+          ({required token, required fullName, required number}) async =>
+              GithubIssueDto(
+                id: 1,
+                number: number,
+                title: 'Bug',
+                state: 'open',
+              ),
+      fetchComments: ({
+        required token,
+        required fullName,
+        required number,
+      }) async => [GithubIssueCommentDto(id: 5, body: 'Hi', author: 'a')],
+    );
+
+    final detail = await gateway.fetchIssueDetail(
+      token: 't',
+      fullName: 'o/r',
+      number: 7,
+    );
+
+    expect(detail.issue.number, 7);
+    expect(detail.comments.single.body, 'Hi');
+  });
+
+  test('creates and closes issues', () async {
+    final gateway = emptyBridge(
+      createIssue: ({
+        required token,
+        required fullName,
+        required title,
+        body,
+      }) async => GithubIssueDto(id: 1, number: 8, title: title, state: 'open'),
+      closeIssue:
+          ({required token, required fullName, required number}) async =>
+              GithubIssueDto(
+                id: 1,
+                number: number,
+                title: 'Bug',
+                state: 'closed',
+              ),
+    );
+
+    final created = await gateway.createIssue(
+      token: 't',
+      fullName: 'o/r',
+      title: 'Bug',
+    );
+    expect(created.number, 8);
+
+    final closed = await gateway.closeIssue(
+      token: 't',
+      fullName: 'o/r',
+      number: 8,
+    );
+    expect(closed.state, GithubIssueState.closed);
+  });
+
+  test('fetches run detail with jobs', () async {
+    final gateway = emptyBridge(
+      fetchRun: ({required token, required fullName, required runId}) async =>
+          GithubRunDto(
+            id: runId,
+            status: 'completed',
+            conclusion: 'failure',
+            runNumber: 12,
+          ),
+      fetchJobs: ({required token, required fullName, required runId}) async =>
+          [
+            GithubCiJobDto(
+              id: 9,
+              name: 'build',
+              status: 'completed',
+              conclusion: 'success',
+            ),
+          ],
+    );
+
+    final detail = await gateway.fetchRunDetail(
+      token: 't',
+      fullName: 'o/r',
+      runId: 12,
+    );
+
+    expect(detail.run.canRetry, isTrue);
+    expect(detail.jobs.single.name, 'build');
   });
 }

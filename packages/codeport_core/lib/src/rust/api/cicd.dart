@@ -16,6 +16,26 @@ Future<List<Pipeline>> githubListRuns({
   fullName: fullName,
 );
 
+Future<Pipeline> githubGetRun({
+  required String token,
+  required String fullName,
+  required BigInt runId,
+}) => RustLib.instance.api.crateApiCicdGithubGetRun(
+  token: token,
+  fullName: fullName,
+  runId: runId,
+);
+
+Future<List<CiJob>> githubListJobs({
+  required String token,
+  required String fullName,
+  required BigInt runId,
+}) => RustLib.instance.api.crateApiCicdGithubListJobs(
+  token: token,
+  fullName: fullName,
+  runId: runId,
+);
+
 Future<void> githubRetryRun({
   required String token,
   required String fullName,

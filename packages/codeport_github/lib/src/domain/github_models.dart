@@ -64,3 +64,57 @@ class GithubRun {
       status == GithubRunStatus.completed &&
       conclusion == GithubRunConclusion.failure;
 }
+
+class GithubCommit {
+  const GithubCommit({
+    required this.sha,
+    required this.message,
+    required this.author,
+  });
+
+  final String sha;
+  final String message;
+  final String author;
+
+  String get shortSha => sha.length > 7 ? sha.substring(0, 7) : sha;
+}
+
+class GithubIssueComment {
+  const GithubIssueComment({
+    required this.id,
+    required this.body,
+    required this.author,
+  });
+
+  final int id;
+  final String body;
+  final String author;
+}
+
+class GithubIssueDetail {
+  const GithubIssueDetail({required this.issue, required this.comments});
+
+  final GithubIssue issue;
+  final List<GithubIssueComment> comments;
+}
+
+class GithubCiJob {
+  const GithubCiJob({
+    required this.id,
+    required this.name,
+    required this.status,
+    this.conclusion,
+  });
+
+  final int id;
+  final String name;
+  final GithubRunStatus status;
+  final GithubRunConclusion? conclusion;
+}
+
+class GithubRunDetail {
+  const GithubRunDetail({required this.run, required this.jobs});
+
+  final GithubRun run;
+  final List<GithubCiJob> jobs;
+}

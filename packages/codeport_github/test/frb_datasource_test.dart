@@ -67,11 +67,10 @@ void main() {
 
   test('BridgeGateway wires a datasource end to end', () async {
     final source = fakeSource();
-    final gateway = BridgeGateway(
+    final gateway = emptyBridge(
       fetchRepos: source.asFetchRepos,
       fetchIssues: source.asFetchIssues,
       fetchRuns: source.asFetchRuns,
-      doRetry: ({required token, required fullName, required runId}) async {},
     );
 
     expect((await gateway.fetchRepoPage(token: 't', page: 1)).items, isEmpty);

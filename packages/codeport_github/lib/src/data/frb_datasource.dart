@@ -76,12 +76,207 @@ Future<void> liveRetryRun({
   );
 }
 
+Future<GithubRepoDto> liveFetchRepo({
+  required String token,
+  required String fullName,
+}) async {
+  final r = await githubGetRepo(token: token, fullName: fullName);
+  return GithubRepoDto(
+    id: r.id.toInt(),
+    fullName: r.fullName,
+    private: r.private,
+    stars: r.stars.toInt(),
+    defaultBranch: r.defaultBranch,
+  );
+}
+
+Future<List<GithubCommitDto>> liveFetchCommits({
+  required String token,
+  required String fullName,
+}) async {
+  final commits = await githubListCommits(token: token, fullName: fullName);
+  return commits
+      .map(
+        (c) =>
+            GithubCommitDto(sha: c.sha, message: c.message, author: c.author),
+      )
+      .toList();
+}
+
+Future<GithubIssueDto> liveFetchIssue({
+  required String token,
+  required String fullName,
+  required int number,
+}) async {
+  final r = await githubGetIssue(
+    token: token,
+    fullName: fullName,
+    number: BigInt.from(number),
+  );
+  return GithubIssueDto(
+    id: r.id.toInt(),
+    number: r.number.toInt(),
+    title: r.title,
+    state: r.state.name,
+    labels: r.labels,
+  );
+}
+
+Future<List<GithubIssueCommentDto>> liveFetchComments({
+  required String token,
+  required String fullName,
+  required int number,
+}) async {
+  final comments = await githubListComments(
+    token: token,
+    fullName: fullName,
+    number: BigInt.from(number),
+  );
+  return comments
+      .map(
+        (c) => GithubIssueCommentDto(
+          id: c.id.toInt(),
+          body: c.body,
+          author: c.author,
+        ),
+      )
+      .toList();
+}
+
+Future<GithubIssueDto> liveCreateIssue({
+  required String token,
+  required String fullName,
+  required String title,
+  String? body,
+}) async {
+  final r = await githubCreateIssue(
+    token: token,
+    fullName: fullName,
+    title: title,
+    body: body,
+  );
+  return GithubIssueDto(
+    id: r.id.toInt(),
+    number: r.number.toInt(),
+    title: r.title,
+    state: r.state.name,
+    labels: r.labels,
+  );
+}
+
+Future<GithubIssueDto> liveCloseIssue({
+  required String token,
+  required String fullName,
+  required int number,
+}) async {
+  final r = await githubCloseIssue(
+    token: token,
+    fullName: fullName,
+    number: BigInt.from(number),
+  );
+  return GithubIssueDto(
+    id: r.id.toInt(),
+    number: r.number.toInt(),
+    title: r.title,
+    state: r.state.name,
+    labels: r.labels,
+  );
+}
+
+Future<GithubIssueDto> liveReopenIssue({
+  required String token,
+  required String fullName,
+  required int number,
+}) async {
+  final r = await githubReopenIssue(
+    token: token,
+    fullName: fullName,
+    number: BigInt.from(number),
+  );
+  return GithubIssueDto(
+    id: r.id.toInt(),
+    number: r.number.toInt(),
+    title: r.title,
+    state: r.state.name,
+    labels: r.labels,
+  );
+}
+
+Future<GithubIssueCommentDto> liveCreateComment({
+  required String token,
+  required String fullName,
+  required int number,
+  required String body,
+}) async {
+  final r = await githubCreateComment(
+    token: token,
+    fullName: fullName,
+    number: BigInt.from(number),
+    body: body,
+  );
+  return GithubIssueCommentDto(
+    id: r.id.toInt(),
+    body: r.body,
+    author: r.author,
+  );
+}
+
+Future<GithubRunDto> liveFetchRun({
+  required String token,
+  required String fullName,
+  required int runId,
+}) async {
+  final r = await githubGetRun(
+    token: token,
+    fullName: fullName,
+    runId: BigInt.from(runId),
+  );
+  return GithubRunDto(
+    id: r.id.toInt(),
+    status: r.status.name,
+    conclusion: r.conclusion?.name,
+    runNumber: r.runNumber.toInt(),
+  );
+}
+
+Future<List<GithubCiJobDto>> liveFetchJobs({
+  required String token,
+  required String fullName,
+  required int runId,
+}) async {
+  final jobs = await githubListJobs(
+    token: token,
+    fullName: fullName,
+    runId: BigInt.from(runId),
+  );
+  return jobs
+      .map(
+        (j) => GithubCiJobDto(
+          id: j.id.toInt(),
+          name: j.name,
+          status: j.status.name,
+          conclusion: j.conclusion?.name,
+        ),
+      )
+      .toList();
+}
+
 BridgeGateway liveBridgeGateway() {
   return BridgeGateway(
-    fetchRepos: liveFetchRepos,
-    fetchIssues: liveFetchIssues,
-    fetchRuns: liveFetchRuns,
-    doRetry: liveRetryRun,
+    fetchRepoPage: liveFetchRepos,
+    fetchIssueList: liveFetchIssues,
+    fetchRunList: liveFetchRuns,
+    retryRun: liveRetryRun,
+    fetchSingleRepo: liveFetchRepo,
+    fetchCommitList: liveFetchCommits,
+    fetchSingleIssue: liveFetchIssue,
+    fetchCommentList: liveFetchComments,
+    createNewIssue: liveCreateIssue,
+    closeCurrentIssue: liveCloseIssue,
+    reopenCurrentIssue: liveReopenIssue,
+    createNewComment: liveCreateComment,
+    fetchSingleRun: liveFetchRun,
+    fetchJobList: liveFetchJobs,
   );
 }
 
@@ -129,6 +324,44 @@ class FrbRunRecord {
   final String status;
   final String? conclusion;
   final BigInt runNumber;
+}
+
+class FrbCommitRecord {
+  const FrbCommitRecord({
+    required this.sha,
+    required this.message,
+    required this.author,
+  });
+
+  final String sha;
+  final String message;
+  final String author;
+}
+
+class FrbCommentRecord {
+  const FrbCommentRecord({
+    required this.id,
+    required this.body,
+    required this.author,
+  });
+
+  final BigInt id;
+  final String body;
+  final String author;
+}
+
+class FrbJobRecord {
+  const FrbJobRecord({
+    required this.id,
+    required this.name,
+    required this.status,
+    this.conclusion,
+  });
+
+  final BigInt id;
+  final String name;
+  final String status;
+  final String? conclusion;
 }
 
 class FrbGithubDataSource {

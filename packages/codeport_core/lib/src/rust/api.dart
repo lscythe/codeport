@@ -12,6 +12,34 @@ part 'api.freezed.dart';
 // These functions are ignored because they are not marked as `pub`: `validate_full_name`
 // These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `fmt`
 
+class CiJob {
+  final BigInt id;
+  final String name;
+  final PipelineStatus status;
+  final PipelineConclusion? conclusion;
+
+  const CiJob({
+    required this.id,
+    required this.name,
+    required this.status,
+    this.conclusion,
+  });
+
+  @override
+  int get hashCode =>
+      id.hashCode ^ name.hashCode ^ status.hashCode ^ conclusion.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is CiJob &&
+          runtimeType == other.runtimeType &&
+          id == other.id &&
+          name == other.name &&
+          status == other.status &&
+          conclusion == other.conclusion;
+}
+
 @freezed
 sealed class CodeportError with _$CodeportError implements FrbException {
   const CodeportError._();
@@ -23,6 +51,30 @@ sealed class CodeportError with _$CodeportError implements FrbException {
   const factory CodeportError.notFound() = CodeportError_NotFound;
   const factory CodeportError.validation(String field0) =
       CodeportError_Validation;
+}
+
+class Commit {
+  final String sha;
+  final String message;
+  final String author;
+
+  const Commit({
+    required this.sha,
+    required this.message,
+    required this.author,
+  });
+
+  @override
+  int get hashCode => sha.hashCode ^ message.hashCode ^ author.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is Commit &&
+          runtimeType == other.runtimeType &&
+          sha == other.sha &&
+          message == other.message &&
+          author == other.author;
 }
 
 class Issue {
@@ -58,6 +110,30 @@ class Issue {
           title == other.title &&
           state == other.state &&
           labels == other.labels;
+}
+
+class IssueComment {
+  final BigInt id;
+  final String body;
+  final String author;
+
+  const IssueComment({
+    required this.id,
+    required this.body,
+    required this.author,
+  });
+
+  @override
+  int get hashCode => id.hashCode ^ body.hashCode ^ author.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is IssueComment &&
+          runtimeType == other.runtimeType &&
+          id == other.id &&
+          body == other.body &&
+          author == other.author;
 }
 
 enum IssueState { open, closed }

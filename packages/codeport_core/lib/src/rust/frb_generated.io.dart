@@ -39,7 +39,13 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   int dco_decode_box_autoadd_u_32(dynamic raw);
 
   @protected
+  CiJob dco_decode_ci_job(dynamic raw);
+
+  @protected
   CodeportError dco_decode_codeport_error(dynamic raw);
+
+  @protected
+  Commit dco_decode_commit(dynamic raw);
 
   @protected
   int dco_decode_i_32(dynamic raw);
@@ -48,13 +54,25 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   Issue dco_decode_issue(dynamic raw);
 
   @protected
+  IssueComment dco_decode_issue_comment(dynamic raw);
+
+  @protected
   IssueState dco_decode_issue_state(dynamic raw);
 
   @protected
   List<String> dco_decode_list_String(dynamic raw);
 
   @protected
+  List<CiJob> dco_decode_list_ci_job(dynamic raw);
+
+  @protected
+  List<Commit> dco_decode_list_commit(dynamic raw);
+
+  @protected
   List<Issue> dco_decode_list_issue(dynamic raw);
+
+  @protected
+  List<IssueComment> dco_decode_list_issue_comment(dynamic raw);
 
   @protected
   List<Pipeline> dco_decode_list_pipeline(dynamic raw);
@@ -118,7 +136,13 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   int sse_decode_box_autoadd_u_32(SseDeserializer deserializer);
 
   @protected
+  CiJob sse_decode_ci_job(SseDeserializer deserializer);
+
+  @protected
   CodeportError sse_decode_codeport_error(SseDeserializer deserializer);
+
+  @protected
+  Commit sse_decode_commit(SseDeserializer deserializer);
 
   @protected
   int sse_decode_i_32(SseDeserializer deserializer);
@@ -127,13 +151,27 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   Issue sse_decode_issue(SseDeserializer deserializer);
 
   @protected
+  IssueComment sse_decode_issue_comment(SseDeserializer deserializer);
+
+  @protected
   IssueState sse_decode_issue_state(SseDeserializer deserializer);
 
   @protected
   List<String> sse_decode_list_String(SseDeserializer deserializer);
 
   @protected
+  List<CiJob> sse_decode_list_ci_job(SseDeserializer deserializer);
+
+  @protected
+  List<Commit> sse_decode_list_commit(SseDeserializer deserializer);
+
+  @protected
   List<Issue> sse_decode_list_issue(SseDeserializer deserializer);
+
+  @protected
+  List<IssueComment> sse_decode_list_issue_comment(
+    SseDeserializer deserializer,
+  );
 
   @protected
   List<Pipeline> sse_decode_list_pipeline(SseDeserializer deserializer);
@@ -200,7 +238,13 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   void sse_encode_box_autoadd_u_32(int self, SseSerializer serializer);
 
   @protected
+  void sse_encode_ci_job(CiJob self, SseSerializer serializer);
+
+  @protected
   void sse_encode_codeport_error(CodeportError self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_commit(Commit self, SseSerializer serializer);
 
   @protected
   void sse_encode_i_32(int self, SseSerializer serializer);
@@ -209,13 +253,28 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   void sse_encode_issue(Issue self, SseSerializer serializer);
 
   @protected
+  void sse_encode_issue_comment(IssueComment self, SseSerializer serializer);
+
+  @protected
   void sse_encode_issue_state(IssueState self, SseSerializer serializer);
 
   @protected
   void sse_encode_list_String(List<String> self, SseSerializer serializer);
 
   @protected
+  void sse_encode_list_ci_job(List<CiJob> self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_list_commit(List<Commit> self, SseSerializer serializer);
+
+  @protected
   void sse_encode_list_issue(List<Issue> self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_list_issue_comment(
+    List<IssueComment> self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_list_pipeline(List<Pipeline> self, SseSerializer serializer);

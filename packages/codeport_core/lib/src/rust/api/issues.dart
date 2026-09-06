@@ -17,3 +17,67 @@ Future<List<Issue>> githubListIssues({
   fullName: fullName,
   state: state,
 );
+
+Future<Issue> githubGetIssue({
+  required String token,
+  required String fullName,
+  required BigInt number,
+}) => RustLib.instance.api.crateApiIssuesGithubGetIssue(
+  token: token,
+  fullName: fullName,
+  number: number,
+);
+
+Future<List<IssueComment>> githubListComments({
+  required String token,
+  required String fullName,
+  required BigInt number,
+}) => RustLib.instance.api.crateApiIssuesGithubListComments(
+  token: token,
+  fullName: fullName,
+  number: number,
+);
+
+Future<Issue> githubCreateIssue({
+  required String token,
+  required String fullName,
+  required String title,
+  String? body,
+}) => RustLib.instance.api.crateApiIssuesGithubCreateIssue(
+  token: token,
+  fullName: fullName,
+  title: title,
+  body: body,
+);
+
+Future<Issue> githubCloseIssue({
+  required String token,
+  required String fullName,
+  required BigInt number,
+}) => RustLib.instance.api.crateApiIssuesGithubCloseIssue(
+  token: token,
+  fullName: fullName,
+  number: number,
+);
+
+Future<Issue> githubReopenIssue({
+  required String token,
+  required String fullName,
+  required BigInt number,
+}) => RustLib.instance.api.crateApiIssuesGithubReopenIssue(
+  token: token,
+  fullName: fullName,
+  number: number,
+);
+
+Future<IssueComment> githubCreateComment({
+  required String token,
+  required String fullName,
+  required BigInt number,
+  required String body,
+}) => RustLib.instance.api.crateApiIssuesGithubCreateComment(
+  token: token,
+  fullName: fullName,
+  number: number,
+  body: body,
+);

@@ -55,3 +55,61 @@ pub struct Pipeline {
     pub conclusion: Option<PipelineConclusion>,
     pub run_number: u64,
 }
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(from = "GithubCommitPayload")]
+pub struct Commit {
+    pub sha: String,
+    pub message: String,
+    pub author: String,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Deserialize)]
+struct GithubCommitPayload {
+    #[serde(default)]
+    sha: String,
+    #[serde(default)]
+    commit: CommitDetail,
+}
+
+#[derive(Default, Debug, Clone, PartialEq, Eq, Deserialize)]
+struct CommitDetail {
+    #[serde(default)]
+    message: String,
+    #[serde(default)]
+    author: AuthorName,
+}
+
+#[derive(Default, Debug, Clone, PartialEq, Eq, Deserialize)]
+struct AuthorName {
+    #[serde(default)]
+    name: String,
+}
+
+impl From<GithubCommitPayload> for Commit {
+    fn from(p: GithubCommitPayload) -> Self {
+        Self {
+            sha: p.sha,
+            message: p.commit.message,
+            author: p.commit.author.name,
+        }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct IssueComment {
+    pub id: u64,
+    #[serde(default)]
+    pub body: String,
+    #[serde(default)]
+    pub author: String,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct CiJob {
+    pub id: u64,
+    #[serde(default)]
+    pub name: String,
+    pub status: PipelineStatus,
+    pub conclusion: Option<PipelineConclusion>,
+}

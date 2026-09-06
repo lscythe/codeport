@@ -28,6 +28,27 @@ impl BlockingHttp {
         Ok(())
     }
 
+    fn github_headers(auth: &str) -> reqwest::header::HeaderMap {
+        let mut headers = reqwest::header::HeaderMap::new();
+        headers.insert(
+            reqwest::header::AUTHORIZATION,
+            reqwest::header::HeaderValue::from_str(auth).expect("auth header value"),
+        );
+        headers.insert(
+            reqwest::header::ACCEPT,
+            reqwest::header::HeaderValue::from_static("application/vnd.github+json"),
+        );
+        headers.insert(
+            "X-GitHub-Api-Version",
+            reqwest::header::HeaderValue::from_static("2022-11-28"),
+        );
+        headers.insert(
+            reqwest::header::CONTENT_TYPE,
+            reqwest::header::HeaderValue::from_static("application/json"),
+        );
+        headers
+    }
+
     fn response(res: reqwest::blocking::Response) -> Result<HttpResponse, CodeportError> {
         let status = res.status().as_u16();
         let headers = res.headers().clone();
@@ -63,9 +84,7 @@ impl HttpClient for BlockingHttp {
         let res = self
             .inner
             .get(url)
-            .header(reqwest::header::AUTHORIZATION, auth)
-            .header(reqwest::header::ACCEPT, "application/vnd.github+json")
-            .header("X-GitHub-Api-Version", "2022-11-28")
+            .headers(Self::github_headers(auth))
             .send()
             .map_err(|e| CodeportError::Network(e.to_string()))?;
         Self::response(res)
@@ -76,10 +95,32 @@ impl HttpClient for BlockingHttp {
         let res = self
             .inner
             .post(url)
-            .header(reqwest::header::AUTHORIZATION, auth)
-            .header(reqwest::header::ACCEPT, "application/vnd.github+json")
-            .header("X-GitHub-Api-Version", "2022-11-28")
+            .headers(Self::github_headers(auth))
             .body(String::new())
+            .send()
+            .map_err(|e| CodeportError::Network(e.to_string()))?;
+        Self::response(res)
+    }
+
+    fn post_json(&self, url: &str, auth: &str, body: &str) -> Result<HttpResponse, CodeportError> {
+        Self::validated(url, auth)?;
+        let res = self
+            .inner
+            .post(url)
+            .headers(Self::github_headers(auth))
+            .body(body.to_string())
+            .send()
+            .map_err(|e| CodeportError::Network(e.to_string()))?;
+        Self::response(res)
+    }
+
+    fn patch_json(&self, url: &str, auth: &str, body: &str) -> Result<HttpResponse, CodeportError> {
+        Self::validated(url, auth)?;
+        let res = self
+            .inner
+            .patch(url)
+            .headers(Self::github_headers(auth))
+            .body(body.to_string())
             .send()
             .map_err(|e| CodeportError::Network(e.to_string()))?;
         Self::response(res)

@@ -48,6 +48,16 @@ void main() {
     })?
     retryRun,
   }) {
+    GithubRepo stubRepo() => GithubRepo(
+      id: 0,
+      fullName: GithubFullName(owner: 'o', name: 'r'),
+      private: false,
+      stars: 0,
+      defaultBranch: 'main',
+    );
+    GithubIssue stubIssue() =>
+        GithubIssue(id: 0, number: 0, title: '', state: GithubIssueState.open);
+
     return GithubGateway(
       listRepoPage:
           listRepoPage ??
@@ -60,6 +70,49 @@ void main() {
       retryRun:
           retryRun ??
           ({required token, required fullName, required runId}) async {},
+      getRepo: ({required token, required fullName}) async => stubRepo(),
+      listCommits: ({required token, required fullName}) async => [],
+      getIssue: ({
+        required token,
+        required fullName,
+        required int number,
+      }) async => GithubIssueDetail(issue: stubIssue(), comments: []),
+      createIssue: ({
+        required token,
+        required fullName,
+        required String title,
+        body,
+      }) async => stubIssue(),
+      closeIssue: ({
+        required token,
+        required fullName,
+        required int number,
+      }) async => stubIssue(),
+      reopenIssue: ({
+        required token,
+        required fullName,
+        required int number,
+      }) async => stubIssue(),
+      createComment: ({
+        required token,
+        required fullName,
+        required int number,
+        required String body,
+      }) async => GithubIssueComment(id: 0, body: body, author: ''),
+      getRun: ({required token, required fullName, required int runId}) async =>
+          GithubRunDetail(
+            run: GithubRun(
+              id: runId,
+              status: GithubRunStatus.queued,
+              runNumber: runId,
+            ),
+            jobs: [],
+          ),
+      listJobs: ({
+        required token,
+        required fullName,
+        required int runId,
+      }) async => [],
     );
   }
 
@@ -171,5 +224,35 @@ void main() {
     expect(runs.single.canRetry, isTrue);
     await container.read(retryRunProvider(fullName: 'o/r', runId: 12).future);
     expect(retried, 1);
+  });
+
+  test('repoDetail and commitList load repo data', () async {
+    final container = makeContainer(fakeGateway());
+    addTearDown(container.dispose);
+
+    final repo = await container.read(repoDetailProvider('o/r').future);
+    expect(repo.fullName, 'o/r');
+
+    final commits = await container.read(commitListProvider('o/r').future);
+    expect(commits, isEmpty);
+  });
+
+  test('issueDetail loads issue with comments', () async {
+    final container = makeContainer(fakeGateway());
+    addTearDown(container.dispose);
+
+    final detail = await container.read(issueDetailProvider('o/r', 0).future);
+    expect(detail.commentCountLabel, '0 comments');
+  });
+
+  test('runDetail and jobList load run data', () async {
+    final container = makeContainer(fakeGateway());
+    addTearDown(container.dispose);
+
+    final detail = await container.read(runDetailProvider('o/r', 0).future);
+    expect(detail.jobs, isEmpty);
+
+    final jobs = await container.read(jobListProvider('o/r', 0).future);
+    expect(jobs, isEmpty);
   });
 }

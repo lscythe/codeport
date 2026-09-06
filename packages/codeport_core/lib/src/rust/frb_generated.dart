@@ -74,7 +74,7 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
   String get codegenVersion => '2.13.0';
 
   @override
-  int get rustContentHash => -701466522;
+  int get rustContentHash => -378318932;
 
   static const kDefaultExternalLibraryLoaderConfig =
       ExternalLibraryLoaderConfig(
@@ -86,10 +86,64 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
 }
 
 abstract class RustLibApi extends BaseApi {
+  Future<Issue> crateApiIssuesGithubCloseIssue({
+    required String token,
+    required String fullName,
+    required BigInt number,
+  });
+
+  Future<IssueComment> crateApiIssuesGithubCreateComment({
+    required String token,
+    required String fullName,
+    required BigInt number,
+    required String body,
+  });
+
+  Future<Issue> crateApiIssuesGithubCreateIssue({
+    required String token,
+    required String fullName,
+    required String title,
+    String? body,
+  });
+
+  Future<Issue> crateApiIssuesGithubGetIssue({
+    required String token,
+    required String fullName,
+    required BigInt number,
+  });
+
+  Future<Repo> crateApiRepositoriesGithubGetRepo({
+    required String token,
+    required String fullName,
+  });
+
+  Future<Pipeline> crateApiCicdGithubGetRun({
+    required String token,
+    required String fullName,
+    required BigInt runId,
+  });
+
+  Future<List<IssueComment>> crateApiIssuesGithubListComments({
+    required String token,
+    required String fullName,
+    required BigInt number,
+  });
+
+  Future<List<Commit>> crateApiRepositoriesGithubListCommits({
+    required String token,
+    required String fullName,
+  });
+
   Future<List<Issue>> crateApiIssuesGithubListIssues({
     required String token,
     required String fullName,
     String? state,
+  });
+
+  Future<List<CiJob>> crateApiCicdGithubListJobs({
+    required String token,
+    required String fullName,
+    required BigInt runId,
   });
 
   Future<RepoPage> crateApiRepositoriesGithubListRepos({
@@ -100,6 +154,12 @@ abstract class RustLibApi extends BaseApi {
   Future<List<Pipeline>> crateApiCicdGithubListRuns({
     required String token,
     required String fullName,
+  });
+
+  Future<Issue> crateApiIssuesGithubReopenIssue({
+    required String token,
+    required String fullName,
+    required BigInt number,
   });
 
   Future<void> crateApiCicdGithubRetryRun({
@@ -124,6 +184,301 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   });
 
   @override
+  Future<Issue> crateApiIssuesGithubCloseIssue({
+    required String token,
+    required String fullName,
+    required BigInt number,
+  }) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_String(token, serializer);
+          sse_encode_String(fullName, serializer);
+          sse_encode_u_64(number, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 1,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_issue,
+          decodeErrorData: sse_decode_codeport_error,
+        ),
+        constMeta: kCrateApiIssuesGithubCloseIssueConstMeta,
+        argValues: [token, fullName, number],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiIssuesGithubCloseIssueConstMeta =>
+      const TaskConstMeta(
+        debugName: "github_close_issue",
+        argNames: ["token", "fullName", "number"],
+      );
+
+  @override
+  Future<IssueComment> crateApiIssuesGithubCreateComment({
+    required String token,
+    required String fullName,
+    required BigInt number,
+    required String body,
+  }) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_String(token, serializer);
+          sse_encode_String(fullName, serializer);
+          sse_encode_u_64(number, serializer);
+          sse_encode_String(body, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 2,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_issue_comment,
+          decodeErrorData: sse_decode_codeport_error,
+        ),
+        constMeta: kCrateApiIssuesGithubCreateCommentConstMeta,
+        argValues: [token, fullName, number, body],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiIssuesGithubCreateCommentConstMeta =>
+      const TaskConstMeta(
+        debugName: "github_create_comment",
+        argNames: ["token", "fullName", "number", "body"],
+      );
+
+  @override
+  Future<Issue> crateApiIssuesGithubCreateIssue({
+    required String token,
+    required String fullName,
+    required String title,
+    String? body,
+  }) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_String(token, serializer);
+          sse_encode_String(fullName, serializer);
+          sse_encode_String(title, serializer);
+          sse_encode_opt_String(body, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 3,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_issue,
+          decodeErrorData: sse_decode_codeport_error,
+        ),
+        constMeta: kCrateApiIssuesGithubCreateIssueConstMeta,
+        argValues: [token, fullName, title, body],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiIssuesGithubCreateIssueConstMeta =>
+      const TaskConstMeta(
+        debugName: "github_create_issue",
+        argNames: ["token", "fullName", "title", "body"],
+      );
+
+  @override
+  Future<Issue> crateApiIssuesGithubGetIssue({
+    required String token,
+    required String fullName,
+    required BigInt number,
+  }) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_String(token, serializer);
+          sse_encode_String(fullName, serializer);
+          sse_encode_u_64(number, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 4,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_issue,
+          decodeErrorData: sse_decode_codeport_error,
+        ),
+        constMeta: kCrateApiIssuesGithubGetIssueConstMeta,
+        argValues: [token, fullName, number],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiIssuesGithubGetIssueConstMeta =>
+      const TaskConstMeta(
+        debugName: "github_get_issue",
+        argNames: ["token", "fullName", "number"],
+      );
+
+  @override
+  Future<Repo> crateApiRepositoriesGithubGetRepo({
+    required String token,
+    required String fullName,
+  }) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_String(token, serializer);
+          sse_encode_String(fullName, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 5,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_repo,
+          decodeErrorData: sse_decode_codeport_error,
+        ),
+        constMeta: kCrateApiRepositoriesGithubGetRepoConstMeta,
+        argValues: [token, fullName],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiRepositoriesGithubGetRepoConstMeta =>
+      const TaskConstMeta(
+        debugName: "github_get_repo",
+        argNames: ["token", "fullName"],
+      );
+
+  @override
+  Future<Pipeline> crateApiCicdGithubGetRun({
+    required String token,
+    required String fullName,
+    required BigInt runId,
+  }) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_String(token, serializer);
+          sse_encode_String(fullName, serializer);
+          sse_encode_u_64(runId, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 6,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_pipeline,
+          decodeErrorData: sse_decode_codeport_error,
+        ),
+        constMeta: kCrateApiCicdGithubGetRunConstMeta,
+        argValues: [token, fullName, runId],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiCicdGithubGetRunConstMeta => const TaskConstMeta(
+    debugName: "github_get_run",
+    argNames: ["token", "fullName", "runId"],
+  );
+
+  @override
+  Future<List<IssueComment>> crateApiIssuesGithubListComments({
+    required String token,
+    required String fullName,
+    required BigInt number,
+  }) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_String(token, serializer);
+          sse_encode_String(fullName, serializer);
+          sse_encode_u_64(number, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 7,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_list_issue_comment,
+          decodeErrorData: sse_decode_codeport_error,
+        ),
+        constMeta: kCrateApiIssuesGithubListCommentsConstMeta,
+        argValues: [token, fullName, number],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiIssuesGithubListCommentsConstMeta =>
+      const TaskConstMeta(
+        debugName: "github_list_comments",
+        argNames: ["token", "fullName", "number"],
+      );
+
+  @override
+  Future<List<Commit>> crateApiRepositoriesGithubListCommits({
+    required String token,
+    required String fullName,
+  }) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_String(token, serializer);
+          sse_encode_String(fullName, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 8,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_list_commit,
+          decodeErrorData: sse_decode_codeport_error,
+        ),
+        constMeta: kCrateApiRepositoriesGithubListCommitsConstMeta,
+        argValues: [token, fullName],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiRepositoriesGithubListCommitsConstMeta =>
+      const TaskConstMeta(
+        debugName: "github_list_commits",
+        argNames: ["token", "fullName"],
+      );
+
+  @override
   Future<List<Issue>> crateApiIssuesGithubListIssues({
     required String token,
     required String fullName,
@@ -139,7 +494,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 1,
+            funcId: 9,
             port: port_,
           );
         },
@@ -161,6 +516,42 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
+  Future<List<CiJob>> crateApiCicdGithubListJobs({
+    required String token,
+    required String fullName,
+    required BigInt runId,
+  }) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_String(token, serializer);
+          sse_encode_String(fullName, serializer);
+          sse_encode_u_64(runId, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 10,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_list_ci_job,
+          decodeErrorData: sse_decode_codeport_error,
+        ),
+        constMeta: kCrateApiCicdGithubListJobsConstMeta,
+        argValues: [token, fullName, runId],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiCicdGithubListJobsConstMeta => const TaskConstMeta(
+    debugName: "github_list_jobs",
+    argNames: ["token", "fullName", "runId"],
+  );
+
+  @override
   Future<RepoPage> crateApiRepositoriesGithubListRepos({
     required String token,
     required int page,
@@ -174,7 +565,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 2,
+            funcId: 11,
             port: port_,
           );
         },
@@ -209,7 +600,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 3,
+            funcId: 12,
             port: port_,
           );
         },
@@ -230,6 +621,43 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   );
 
   @override
+  Future<Issue> crateApiIssuesGithubReopenIssue({
+    required String token,
+    required String fullName,
+    required BigInt number,
+  }) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_String(token, serializer);
+          sse_encode_String(fullName, serializer);
+          sse_encode_u_64(number, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 13,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_issue,
+          decodeErrorData: sse_decode_codeport_error,
+        ),
+        constMeta: kCrateApiIssuesGithubReopenIssueConstMeta,
+        argValues: [token, fullName, number],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiIssuesGithubReopenIssueConstMeta =>
+      const TaskConstMeta(
+        debugName: "github_reopen_issue",
+        argNames: ["token", "fullName", "number"],
+      );
+
+  @override
   Future<void> crateApiCicdGithubRetryRun({
     required String token,
     required String fullName,
@@ -245,7 +673,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 4,
+            funcId: 14,
             port: port_,
           );
         },
@@ -272,7 +700,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         callFfi: () {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_String(name, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 5)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 15)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_String,
@@ -297,7 +725,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 6,
+            funcId: 16,
             port: port_,
           );
         },
@@ -325,7 +753,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 7,
+            funcId: 17,
             port: port_,
           );
         },
@@ -368,6 +796,20 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  CiJob dco_decode_ci_job(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 4)
+      throw Exception('unexpected arr length: expect 4 but see ${arr.length}');
+    return CiJob(
+      id: dco_decode_u_64(arr[0]),
+      name: dco_decode_String(arr[1]),
+      status: dco_decode_pipeline_status(arr[2]),
+      conclusion: dco_decode_opt_box_autoadd_pipeline_conclusion(arr[3]),
+    );
+  }
+
+  @protected
   CodeportError dco_decode_codeport_error(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     switch (raw[0]) {
@@ -384,6 +826,19 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       default:
         throw Exception("unreachable");
     }
+  }
+
+  @protected
+  Commit dco_decode_commit(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 3)
+      throw Exception('unexpected arr length: expect 3 but see ${arr.length}');
+    return Commit(
+      sha: dco_decode_String(arr[0]),
+      message: dco_decode_String(arr[1]),
+      author: dco_decode_String(arr[2]),
+    );
   }
 
   @protected
@@ -408,6 +863,19 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  IssueComment dco_decode_issue_comment(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 3)
+      throw Exception('unexpected arr length: expect 3 but see ${arr.length}');
+    return IssueComment(
+      id: dco_decode_u_64(arr[0]),
+      body: dco_decode_String(arr[1]),
+      author: dco_decode_String(arr[2]),
+    );
+  }
+
+  @protected
   IssueState dco_decode_issue_state(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return IssueState.values[raw as int];
@@ -420,9 +888,27 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  List<CiJob> dco_decode_list_ci_job(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return (raw as List<dynamic>).map(dco_decode_ci_job).toList();
+  }
+
+  @protected
+  List<Commit> dco_decode_list_commit(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return (raw as List<dynamic>).map(dco_decode_commit).toList();
+  }
+
+  @protected
   List<Issue> dco_decode_list_issue(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return (raw as List<dynamic>).map(dco_decode_issue).toList();
+  }
+
+  @protected
+  List<IssueComment> dco_decode_list_issue_comment(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return (raw as List<dynamic>).map(dco_decode_issue_comment).toList();
   }
 
   @protected
@@ -568,6 +1054,23 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  CiJob sse_decode_ci_job(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_id = sse_decode_u_64(deserializer);
+    var var_name = sse_decode_String(deserializer);
+    var var_status = sse_decode_pipeline_status(deserializer);
+    var var_conclusion = sse_decode_opt_box_autoadd_pipeline_conclusion(
+      deserializer,
+    );
+    return CiJob(
+      id: var_id,
+      name: var_name,
+      status: var_status,
+      conclusion: var_conclusion,
+    );
+  }
+
+  @protected
   CodeportError sse_decode_codeport_error(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
 
@@ -589,6 +1092,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       default:
         throw UnimplementedError('');
     }
+  }
+
+  @protected
+  Commit sse_decode_commit(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_sha = sse_decode_String(deserializer);
+    var var_message = sse_decode_String(deserializer);
+    var var_author = sse_decode_String(deserializer);
+    return Commit(sha: var_sha, message: var_message, author: var_author);
   }
 
   @protected
@@ -615,6 +1127,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  IssueComment sse_decode_issue_comment(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_id = sse_decode_u_64(deserializer);
+    var var_body = sse_decode_String(deserializer);
+    var var_author = sse_decode_String(deserializer);
+    return IssueComment(id: var_id, body: var_body, author: var_author);
+  }
+
+  @protected
   IssueState sse_decode_issue_state(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var inner = sse_decode_i_32(deserializer);
@@ -634,6 +1155,30 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  List<CiJob> sse_decode_list_ci_job(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var len_ = sse_decode_i_32(deserializer);
+    var ans_ = <CiJob>[];
+    for (var idx_ = 0; idx_ < len_; ++idx_) {
+      ans_.add(sse_decode_ci_job(deserializer));
+    }
+    return ans_;
+  }
+
+  @protected
+  List<Commit> sse_decode_list_commit(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var len_ = sse_decode_i_32(deserializer);
+    var ans_ = <Commit>[];
+    for (var idx_ = 0; idx_ < len_; ++idx_) {
+      ans_.add(sse_decode_commit(deserializer));
+    }
+    return ans_;
+  }
+
+  @protected
   List<Issue> sse_decode_list_issue(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
 
@@ -641,6 +1186,20 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var ans_ = <Issue>[];
     for (var idx_ = 0; idx_ < len_; ++idx_) {
       ans_.add(sse_decode_issue(deserializer));
+    }
+    return ans_;
+  }
+
+  @protected
+  List<IssueComment> sse_decode_list_issue_comment(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var len_ = sse_decode_i_32(deserializer);
+    var ans_ = <IssueComment>[];
+    for (var idx_ = 0; idx_ < len_; ++idx_) {
+      ans_.add(sse_decode_issue_comment(deserializer));
     }
     return ans_;
   }
@@ -820,6 +1379,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_ci_job(CiJob self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_u_64(self.id, serializer);
+    sse_encode_String(self.name, serializer);
+    sse_encode_pipeline_status(self.status, serializer);
+    sse_encode_opt_box_autoadd_pipeline_conclusion(self.conclusion, serializer);
+  }
+
+  @protected
   void sse_encode_codeport_error(CodeportError self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     switch (self) {
@@ -840,6 +1408,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_commit(Commit self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_String(self.sha, serializer);
+    sse_encode_String(self.message, serializer);
+    sse_encode_String(self.author, serializer);
+  }
+
+  @protected
   void sse_encode_i_32(int self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     serializer.buffer.putInt32(self);
@@ -853,6 +1429,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_String(self.title, serializer);
     sse_encode_issue_state(self.state, serializer);
     sse_encode_list_String(self.labels, serializer);
+  }
+
+  @protected
+  void sse_encode_issue_comment(IssueComment self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_u_64(self.id, serializer);
+    sse_encode_String(self.body, serializer);
+    sse_encode_String(self.author, serializer);
   }
 
   @protected
@@ -871,11 +1455,41 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_list_ci_job(List<CiJob> self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    for (final item in self) {
+      sse_encode_ci_job(item, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_list_commit(List<Commit> self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    for (final item in self) {
+      sse_encode_commit(item, serializer);
+    }
+  }
+
+  @protected
   void sse_encode_list_issue(List<Issue> self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_i_32(self.length, serializer);
     for (final item in self) {
       sse_encode_issue(item, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_list_issue_comment(
+    List<IssueComment> self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    for (final item in self) {
+      sse_encode_issue_comment(item, serializer);
     }
   }
 

@@ -104,3 +104,58 @@ GithubRunConclusion? _runConclusion(String? raw) {
     _ => null,
   };
 }
+
+class GithubCommitDto {
+  const GithubCommitDto({
+    required this.sha,
+    required this.message,
+    required this.author,
+  });
+
+  final String sha;
+  final String message;
+  final String author;
+
+  GithubCommit toDomain() {
+    return GithubCommit(sha: sha, message: message, author: author);
+  }
+}
+
+class GithubIssueCommentDto {
+  const GithubIssueCommentDto({
+    required this.id,
+    required this.body,
+    required this.author,
+  });
+
+  final int id;
+  final String body;
+  final String author;
+
+  GithubIssueComment toDomain() {
+    return GithubIssueComment(id: id, body: body, author: author);
+  }
+}
+
+class GithubCiJobDto {
+  const GithubCiJobDto({
+    required this.id,
+    required this.name,
+    required this.status,
+    this.conclusion,
+  });
+
+  final int id;
+  final String name;
+  final String status;
+  final String? conclusion;
+
+  GithubCiJob toDomain() {
+    return GithubCiJob(
+      id: id,
+      name: name,
+      status: _runStatus(status),
+      conclusion: _runConclusion(conclusion),
+    );
+  }
+}

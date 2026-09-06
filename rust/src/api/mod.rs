@@ -59,6 +59,28 @@ pub enum _CodeportErrorMirror {
     Validation(String),
 }
 
+#[flutter_rust_bridge::frb(mirror(Commit))]
+pub struct _CommitMirror {
+    pub sha: String,
+    pub message: String,
+    pub author: String,
+}
+
+#[flutter_rust_bridge::frb(mirror(IssueComment))]
+pub struct _IssueCommentMirror {
+    pub id: u64,
+    pub body: String,
+    pub author: String,
+}
+
+#[flutter_rust_bridge::frb(mirror(CiJob))]
+pub struct _CiJobMirror {
+    pub id: u64,
+    pub name: String,
+    pub status: crate::api::PipelineStatus,
+    pub conclusion: Option<crate::api::PipelineConclusion>,
+}
+
 #[derive(Debug)]
 pub struct RepoPage {
     pub repos: Vec<Repo>,
@@ -66,7 +88,8 @@ pub struct RepoPage {
 }
 
 pub use codeport_core::entities::{
-    Issue, IssueState, Pipeline, PipelineConclusion, PipelineStatus, Repo,
+    CiJob, Commit, Issue, IssueComment, IssueState, Pipeline, PipelineConclusion, PipelineStatus,
+    Repo,
 };
 pub use codeport_core::error::CodeportError;
 
