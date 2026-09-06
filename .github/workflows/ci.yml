@@ -25,9 +25,13 @@ jobs:
         with:
           channel: stable
       - run: dart format --output=none --set-exit-if-changed packages
-      - run: flutter pub get --directory=packages/codeport_core
-      - run: flutter analyze --no-pub --directory=packages/codeport_core
-      - run: flutter test --directory=packages/codeport_core
-      - run: flutter pub get --directory=packages/codeport_github
-      - run: flutter analyze --no-pub --directory=packages/codeport_github
-      - run: flutter test --directory=packages/codeport_github
+      - working-directory: packages/codeport_core
+        run: |
+          flutter pub get
+          flutter analyze --no-pub
+          flutter test
+      - working-directory: packages/codeport_github
+        run: |
+          flutter pub get
+          flutter analyze --no-pub
+          flutter test
