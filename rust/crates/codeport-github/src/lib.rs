@@ -5,5 +5,9 @@
 //! client targets REST (`Link`-header pagination, see [`pagination`]).
 //! GraphQL can be added later per-screen (e.g. issue timelines) behind the
 //! same `codeport-core` traits without touching core or Dart.
+pub mod cicd;
 pub mod client;
+pub mod issues;
 pub mod pagination;
+pub mod repos;
+pub mod store;
